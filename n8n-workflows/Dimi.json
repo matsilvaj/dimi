@@ -676,8 +676,8 @@
       "parameters": {
         "sessionIdType": "customKey",
         "sessionKey": "={{ $('Dados').first().json.user_id }}",
-        "sessionTTL": 600,
-        "contextWindowLength": 10
+        "sessionTTL": 300,
+        "contextWindowLength": 5
       },
       "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
       "typeVersion": 1.5,
