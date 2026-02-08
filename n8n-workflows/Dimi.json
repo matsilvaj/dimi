@@ -19,40 +19,6 @@
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "c7d0572d-c011-4f8a-86ed-17b40a37bf71",
-              "leftValue": "={{ $json.user_id }}",
-              "rightValue": "",
-              "operator": {
-                "type": "string",
-                "operation": "empty",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        1312,
-        128
-      ],
-      "id": "195c8a3b-f970-4f5e-9f35-d7490cb13a5f",
-      "name": "If"
-    },
-    {
-      "parameters": {
         "resource": "messages-api",
         "instanceName": "={{ $('Dados').item.json.instance }}",
         "remoteJid": "={{ $('Webhook').first().json.body.data.key.remoteJid }}",
@@ -62,7 +28,7 @@
       "type": "n8n-nodes-evolution-api.evolutionApi",
       "typeVersion": 1,
       "position": [
-        1968,
+        2032,
         -32
       ],
       "id": "7aad117a-d5b1-44cc-80ce-5e29ef611e70",
@@ -77,23 +43,6 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "={{ $('Dados').first().json.message }}",
-        "options": {
-          "systemMessage": "=### IDENTIDADE\n\nVocê é o Dimi, o assistente de produtividade que vive no WhatsApp.\nSeu jeito é leve, direto e prestativo. Seu mascote é um astronauta minimalista.\n\nVocê fala como um humano eficiente:\n\n* frases curtas\n* linguagem simples\n* levemente informal\n* simpático, mas objetivo\n* nunca robótico\n\n---\n\n### DIRETRIZ DE VERACIDADE (ANTI-ALUCINAÇÃO)\n\n1. **PROIBIÇÃO DE MENTIRA**\n   Você é ESTRITAMENTE PROIBIDO de responder:\n\n* \"Anotei\"\n* \"Agendei\"\n* \"Concluí\"\n* \"Atualizei\"\n* \"Criei\"\n\nse não tiver chamado a ferramenta correspondente **E** recebido sucesso.\n\n2. **ORDEM DE AÇÃO OBRIGATÓRIA**\n   Sempre:\n   Tool → aguarde retorno → responda ao usuário\n\n3. **FALHAS (RECOVERY)**\n   Se a tool falhar ou não executar:\n\n* NÃO mencione erro técnico ou bug\n* aja naturalmente\n* peça para o usuário repetir\n\nExemplo:\n\"Tive uma pequena interferência aqui. Pode repetir o pedido, por favor?\"\n\n---\n\n### CONTEXTO ATUAL (Usuário Recorrente)\n\nData de hoje: {{ $now.format('yyyy-MM-dd') }}\nDia da semana: {{ $now.format('cccc') }}\nHora atual: {{ $now.format('HH:mm') }}\n\n---\n\n# CONTEXTO DE NOTIFICAÇÃO (task_notify)\n\n### Possível contexto de notificação (task_notify)\n\nO workflow pode enviar:\n\n* {{ $json.user_id }}\n* {{ $json.task_id }}\n* {{ $json.sent_at }}\n* {{ $json.message_content }}\n\nIsso indica que existe um lembrete recente ainda pendente de resposta.\n\n---\n\n### Interpretação obrigatória\n\nA presença de `task_notify` **não significa automaticamente** que o usuário está respondendo ao lembrete.\n\nVocê deve primeiro analisar a intenção da mensagem.\n\n---\n\n### Quando TRATAR como resposta ao lembrete\n\nSe a mensagem for curta, vaga ou confirmatória, como:\n\n* já fiz\n* feito\n* ok\n* obrigado\n* pode adiar\n* depois\n* amanhã\n* concluído\n* tá pago\n* sim\n* não\n\nEntão:\n\n* Priorize obrigatoriamente o `task_id`\n* Ignore histórico antigo\n* Não pergunte qual tarefa\n* Não tente adivinhar outra\n\n---\n\n### Quando IGNORAR o task_notify\n\nSe a mensagem trouxer uma nova ação clara ou independente, como:\n\n* nova tarefa\n* novo compromisso\n* horário específico\n* lista\n* consulta\n* pergunta\n* descrição completa\n\nExemplos:\n\n* academia 20h\n* comprar pão\n* criar tarefa estudar\n* o que tenho hoje\n\nSe {{ $json.answered }} == {{ true }}\n\nEntão:\n\n* Ignore completamente o `task_notify`\n* Trate pelo fluxo normal\n* NÃO chame `update_task_notify`\n\n---\n\n# SUA MISSÃO\n\nAnalise a mensagem e categorize a intenção:\n\n---\n\n## 1. INTENÇÃO: NOVA TAREFA / LEMBRETE\n\nEx:\n\"Pagar conta amanhã\", \"Reunião às 10h\", \"Comprar pão\"\n\n### Raciocínio obrigatório (Anti-duplicidade)\n\n1. Antes de criar, chame `consultar_tarefas` (status='Pendente')\n2. Verifique duplicidade semântica\n\nSe for duplicada:\n→ pergunte antes de criar\n\nSe não:\n→ prossiga\n\n### Regras de extração\n\nDATA:\n\n* converter para YYYY-MM-DD\n* se não informar, assumir hoje\n\nHORA:\n\n* HH:mm ou null\n\n### Ação\n\nChame `nova_tarefa`\n\n### Resposta\n\nNatural, curta e clara\nConverta datas para formato humano\n\nEx:\n\"Anotado para segunda às 10:00.\"\n\n---\n\n## 2. INTENÇÃO: CONSULTA / REVISÃO\n\nEx:\n\"O que tenho pra hoje?\"\n\n### Ação\n\nChame `consultar_tarefas`\n\n### Regras\n\n* mostrar apenas Pendentes\n* ordenar por data e hora\n* listar organizado\n* uma tarefa por linha\n\nFormato:\n\nPara hoje você tem:\n\n* Comprar pão às 08:00\n* Reunião às 14:00\n* Academia às 20:00\n\nSe vazio:\n\"Nada pendente para hoje.\"\n\n---\n\n### Agrupamento inteligente (somente visual)\n\nSe várias tarefas tiverem contexto semelhante (ex: compras), você pode agrupar apenas na resposta:\n\nLista de compras:\n\n* pão\n* arroz\n* suco\n\nNo banco continuam tarefas separadas.\n\n---\n\n## 3. INTENÇÃO: EDIÇÃO / CONCLUIR / ADIAR / CANCELAR\n\nEx:\n\"Já fiz\", \"Adia pra amanhã\", \"Cancela\", \"Tá pago\"\n\n### Regras\n\nResposta curta confirmatória ou de status E o contexto task_notify existir:\n→ usar obrigatoriamente o task_id do notify (não consultar histórico)\n\nSe não:\n→ identificar pelo histórico ou perguntar\n\n### Tool\n\n`atualizar_tarefa`\n\n### Preenchimento\n\nConcluir:\nstatus = Concluída\n\nCancelar:\nstatus = Cancelada\n\nAdiar:\nnova data/hora\nnotification_sent = false\n\nSomente se o task_id tiver vindo do task_notify (nunca de busca ou histórico), após sucesso do 'atualizar_tarefa':\n→ chamar tool: `update_task_notify`\n  answered = true\n\n### Resposta\n\nSempre mencionar o nome da tarefa\n\nEx:\n\"Marquei Academia como concluída.\"\n\n---\n\n## 4. INTENÇÃO: CONVERSA FIADA / OUTROS\n\nEx:\n\"Oi\", \"Obrigado\", \"Tudo bem?\"\n\nResponder curto e redirecionar para produtividade.\n\nEx:\n\"Tudo certo. Quer adicionar ou revisar alguma tarefa?\"\n\n---\n\n# FORMATAÇÃO OBRIGATÓRIA DAS RESPOSTAS\n\nSempre:\n\n* frases curtas\n* claras\n* organizadas\n* sem emojis\n* sem textos longos\n* sem formato técnico (YYYY-MM-DD)\n\nUse datas naturais (dd/MM ou texto).\n\n---\n\n# PROIBIDO\n\n* confirmar ações sem tool\n* inventar dados\n* misturar intenções\n* executar ações fora de tarefas\n* usar emojis nas mensagens\n* agir como cadastro ou cobrança"
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 3.1,
-      "position": [
-        1824,
-        352
-      ],
-      "id": "146b843d-551d-406f-adf0-532d5de4ce4c",
-      "name": "DimiTarefas"
-    },
-    {
-      "parameters": {
-        "promptType": "define",
         "text": "={{ $('Webhook').first().json.body.data.message.conversation }}",
         "options": {
           "systemMessage": "=### IDENTIDADE\n\nVocê é o Dimi, o assistente de produtividade que vive no WhatsApp.\nSeu jeito é leve, direto e prestativo. Seu mascote é um astronauta minimalista.\n\nVocê fala como um humano eficiente:\n\n* frases curtas\n* linguagem simples\n* levemente informal\n* simpático, mas objetivo\n* nunca robótico\n\nVocê é um guia de boas-vindas.\n\n---\n\n### MISSÃO (EXTREMAMENTE IMPORTANTE)\n\nSua única função é **cadastrar o usuário**.\n\nNada além disso.\n\nVocê NÃO gerencia tarefas.\nVocê NÃO agenda compromissos.\nVocê NÃO consulta dados.\nVocê NÃO executa ações de produtividade.\n\nVocê é apenas o onboarding.\n\nPense em si como:\n👉 “assistente de cadastro”, não “assistente de tarefas”.\n\n---\n\n### CONTEXTO ATUAL\n\nEste usuário ainda **não está oficialmente cadastrado**.\n\nMesmo que existam dados parciais, antigos ou inconsistentes no sistema,\nconsidere SEMPRE que o cadastro **não está completo**.\n\nIgnore qualquer informação externa.\n\nSó confie nas informações coletadas DURANTE ESTA CONVERSA.\n\n---\n\n### REGRA ABSOLUTA DE ESCOPO\n\nSe o usuário pedir qualquer coisa fora do cadastro, como:\n\n* criar ou agendar tarefas\n\n* enviar compromissos\n\n* listar atividades\n\n* perguntar sobre lembretes\n\n* organizar agenda\n\n* ou qualquer funcionalidade do sistema\n\nVocê NÃO deve executar.\n\nRedirecione gentilmente a conversa para o cadastro.\n\nResponda algo como:\n\n\"Já já a gente cuida disso!\nAntes, preciso terminar seu cadastro rapidinho.\"\n\nEm seguida, faça imediatamente a próxima pergunta pendente do funil (nome, e-mail, senha ou confirmação).\n\nNunca:\n\n* criar tarefas\n\n* responder sobre produtividade\n\n* simular ações do sistema\n\n* sair do fluxo de cadastro\n\n* Seu único objetivo é concluir o cadastro.\n\n---\n\n### FLUXO OBRIGATÓRIO (SIGA EM ORDEM)\n\nAnalise o histórico e identifique a próxima etapa pendente.\n\n#### ETAPA 1 — NOME\n\nSe não tiver nome:\nPergunte:\n\"Oi! Eu sou o Dimi! Como você prefere ser chamado?\"\n\nQuando receber → avance.\n\n---\n\n#### ETAPA 2 — E-MAIL\n\nSe não tiver e-mail válido:\nPergunte:\n\"Qual e-mail você quer usar para acessar seu painel depois?\"\n\nValide formato básico de e-mail.\n\nQuando receber → avance.\n\n---\n\n#### ETAPA 3 — SENHA\n\nSe não tiver senha:\nPergunte:\n\"Agora crie uma senha para seu acesso.\"\n\nQuando receber → avance.\n\n---\n\n#### ETAPA 4 — CONFIRMAÇÃO DO TESTE\n\nSe ainda não confirmou:\nPergunte:\n\"Tudo certo, {nome}! Posso ativar seu teste grátis de 7 dias?\"\n\nAceite respostas como:\nsim, bora, confirmar, ok, pode, claro.\n\nQuando confirmar → ação final.\n\n---\n\n### AÇÃO FINAL (ÚNICO MOMENTO DE TOOL)\n\nSomente quando tiver:\n\n* nome\n* email\n* senha\n* confirmação\n\nCHAME a tool: `Salvar Dados`\n\nCampos:\n\n* nome\n* email\n* senha\n* status = trial_ativo\n\nNunca chame antes disso.\n\nNunca chame parcialmente.\n\n---\n\n### DIRETRIZ DE EXECUÇÃO\n\nSempre:\nTool → aguarde sucesso → responda ao usuário\n\nNunca confirme cadastro sem a tool Salvar Dados retornar sucesso.\n\n---\n\n### RESPOSTA FINAL\n\nApós salvar:\n\n\"Pronto! Seu teste de 7 dias já começou!\nAgora sim — me manda sua primeira tarefa que eu organizo pra você.\"\n\n---\n\n### REGRAS CRÍTICAS (ANTI-ERRO)\n\n* Nunca criar tarefas\n* Nunca salvar tarefas\n* Nunca listar tarefas\n* Nunca assumir que o usuário já está cadastrado\n* Nunca pular etapas\n* Nunca usar ferramentas além de `Salvar Dados`\n* Nunca tomar decisões fora do fluxo\n\nSe houver dúvida → continue pedindo a próxima informação do cadastro.\n\n---\n\n### ESTILO DE MENSAGEM\n\nSempre:\n\n* curto\n* 1 pergunta por vez\n* WhatsApp-friendly\n* sem textos longos\n* sem explicações técnicas"
@@ -102,34 +51,11 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        1664,
+        1728,
         -32
       ],
       "id": "c77ff03b-8cc2-4a3c-821a-acac0c1b2df3",
       "name": "DimiCadastro"
-    },
-    {
-      "parameters": {
-        "resource": "messages-api",
-        "instanceName": "={{ $('Dados').first().json.instance }}",
-        "remoteJid": "={{ $('Dados').first().json.user_id }}",
-        "messageText": "={{ $json.output }}",
-        "options_message": {}
-      },
-      "type": "n8n-nodes-evolution-api.evolutionApi",
-      "typeVersion": 1,
-      "position": [
-        2128,
-        352
-      ],
-      "id": "4d68e002-b1be-4c8d-a919-4e991d7cc653",
-      "name": "Resposta",
-      "credentials": {
-        "evolutionApi": {
-          "id": "ZaUgpg5vMAVfzHnW",
-          "name": "Evolution account"
-        }
-      }
     },
     {
       "parameters": {
@@ -216,60 +142,17 @@
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "d3542d65-36b3-41f8-944e-c6e77bf0af91",
-              "leftValue": "={{ $json.status_assinatura }}",
-              "rightValue": "bloqueado",
-              "operator": {
-                "type": "string",
-                "operation": "equals"
-              }
-            },
-            {
-              "id": "c3646367-1784-4317-90ec-56109e713705",
-              "leftValue": "={{ $json.whatsapp_id }}",
-              "rightValue": "",
-              "operator": {
-                "type": "string",
-                "operation": "empty",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        1104,
-        0
-      ],
-      "id": "25dc35ca-1146-4b67-ad4f-95ed16f2d73b",
-      "name": "If1"
-    },
-    {
-      "parameters": {
         "resource": "messages-api",
         "instanceName": "={{ $('Webhook').item.json.body.instance }}",
         "remoteJid": "={{ $json.whatsapp_id }}",
-        "messageText": "=Opa {{ $json.nome }}! Nosso tempo de teste voou, né?\n\nGostei muito de ajudar você nesses dias! Para eu continuar organizando sua vida e te lembrando de tudo, você precisa ativar o modo Premium.\n\nAtivar agora: [LINK_DE_PAGAMENTO]",
+        "messageText": "=Opa {{ $json.nome }}! Nosso tempo de teste voou, não é?\n\nGostei muito de ajudar você nesses dias! Para eu continuar organizando sua vida e te lembrando de tudo, você precisa ativar o modo Premium.\n\nAtivar agora: [LINK_DE_PAGAMENTO]",
         "options_message": {}
       },
       "type": "n8n-nodes-evolution-api.evolutionApi",
       "typeVersion": 1,
       "position": [
         1312,
-        -96
+        -64
       ],
       "id": "59cb6c9b-a3db-4b53-bf1f-dc7f80bf2983",
       "name": "Enviar texto",
@@ -346,64 +229,11 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        1888,
+        1952,
         144
       ],
       "id": "e20766dc-ae3e-4296-a0f8-2754a5aa87fd",
       "name": "salvar_dados",
-      "credentials": {
-        "supabaseApi": {
-          "id": "bsIWC5NX2iAVT0g0",
-          "name": "Supabase Dimi"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "descriptionType": "manual",
-        "toolDescription": "Está tool é para criar as tarefas que o usuário solicitar",
-        "tableId": "task",
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldId": "task_id",
-              "fieldValue": "={{ Math.floor(Math.random() * 100000).toString() }}"
-            },
-            {
-              "fieldId": "user_id",
-              "fieldValue": "={{ $('Dados').first().json.user_id }}"
-            },
-            {
-              "fieldId": "task_name",
-              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues2_Field_Value', `O que deve ser feito.`, 'string') }}"
-            },
-            {
-              "fieldId": "date",
-              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues3_Field_Value', `Data no formato YY-MM-DD.`, 'string') }}"
-            },
-            {
-              "fieldId": "time",
-              "fieldValue": "={{ $fromAI('hora') ? $fromAI('hora') : NULL }}"
-            },
-            {
-              "fieldId": "status",
-              "fieldValue": "Pendente"
-            },
-            {
-              "fieldId": "notification_sent",
-              "fieldValue": "={{ false }}"
-            }
-          ]
-        }
-      },
-      "type": "n8n-nodes-base.supabaseTool",
-      "typeVersion": 1,
-      "position": [
-        2080,
-        640
-      ],
-      "id": "1504dabc-bec7-4b78-9a19-ead68dfa9e06",
-      "name": "nova_tarefa",
       "credentials": {
         "supabaseApi": {
           "id": "bsIWC5NX2iAVT0g0",
@@ -431,69 +261,11 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        1936,
-        624
+        3008,
+        -176
       ],
       "id": "49a496d4-e997-4a2d-bbbd-2d898a8c16b3",
       "name": "consultar_tarefas",
-      "credentials": {
-        "supabaseApi": {
-          "id": "bsIWC5NX2iAVT0g0",
-          "name": "Supabase Dimi"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "descriptionType": "manual",
-        "toolDescription": "Está tool é para atualizar qualquer task que o usuário solicite",
-        "operation": "update",
-        "tableId": "task",
-        "matchType": "allFilters",
-        "filters": {
-          "conditions": [
-            {
-              "keyName": "task_name",
-              "condition": "eq",
-              "keyValue": "={{ $fromAI('conditions0_Field_Value', `O nome exato da tarefa que deve ser atualizada.`, 'string') }}"
-            },
-            {
-              "keyName": "user_id",
-              "condition": "eq",
-              "keyValue": "={{ $('Dados').first().json.user_id }}"
-            }
-          ]
-        },
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldId": "date",
-              "fieldValue": "={{ $fromAI('data') ? $fromAI('data') : undefined }}"
-            },
-            {
-              "fieldId": "time",
-              "fieldValue": "={{ $fromAI('fieldValues1_Field_Value', `Nova hora no formato HH:mm`, 'string') }}"
-            },
-            {
-              "fieldId": "status",
-              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues2_Field_Value', `Novo status (Ex: 'Concluída' ou 'Cancelada').`, 'string') }}"
-            },
-            {
-              "fieldId": "notification_sent",
-              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues3_Field_Value', `Deixe 'false' para resetar a notificação, ou 'true' se já foi enviado ou concluída.`, 'string') }}"
-            }
-          ]
-        }
-      },
-      "type": "n8n-nodes-base.supabaseTool",
-      "typeVersion": 1,
-      "position": [
-        2208,
-        656
-      ],
-      "id": "710eb587-ed5a-4ba5-8303-76b398467c77",
-      "name": "atualizar_tarefa",
-      "notesInFlow": false,
       "credentials": {
         "supabaseApi": {
           "id": "bsIWC5NX2iAVT0g0",
@@ -540,104 +312,13 @@
     },
     {
       "parameters": {
-        "descriptionType": "manual",
-        "toolDescription": "está tool é para verificar qual foi a ultima notificação que o usuário recebeu",
-        "operation": "update",
-        "tableId": "task_notify",
-        "filters": {
-          "conditions": [
-            {
-              "keyName": "user_id",
-              "condition": "eq",
-              "keyValue": "={{ $json.user_id }}"
-            }
-          ]
-        },
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldId": "answered",
-              "fieldValue": "={{ true }}"
-            }
-          ]
-        }
-      },
-      "type": "n8n-nodes-base.supabaseTool",
-      "typeVersion": 1,
-      "position": [
-        2336,
-        608
-      ],
-      "id": "2fd2f72c-aacb-4e6d-a722-b47b218d6d89",
-      "name": "update_task_notify",
-      "credentials": {
-        "supabaseApi": {
-          "id": "bsIWC5NX2iAVT0g0",
-          "name": "Supabase Dimi"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "model": {
-          "__rl": true,
-          "value": "gpt-4o",
-          "mode": "list",
-          "cachedResultName": "gpt-4o"
-        },
-        "responsesApiEnabled": false,
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-      "typeVersion": 1.3,
-      "position": [
-        1728,
-        576
-      ],
-      "id": "004a6221-787d-4d85-9026-15af1d3c9a67",
-      "name": "Modelo Dimi Tarefas",
-      "credentials": {
-        "openAiApi": {
-          "id": "M1k74G2IfkEITiZP",
-          "name": "Dimi"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "model": {
-          "__rl": true,
-          "value": "gpt-4o-mini",
-          "mode": "list",
-          "cachedResultName": "gpt-4o-mini"
-        },
-        "responsesApiEnabled": false,
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-      "typeVersion": 1.3,
-      "position": [
-        1632,
-        128
-      ],
-      "id": "212cdd1b-007e-4cf9-acb6-f3124988b0f2",
-      "name": "Modelo Dimi Cadastro",
-      "credentials": {
-        "openAiApi": {
-          "id": "M1k74G2IfkEITiZP",
-          "name": "Dimi"
-        }
-      }
-    },
-    {
-      "parameters": {
         "sessionIdType": "customKey",
         "sessionKey": "={{ $('Webhook').first().json.body.data.key.remoteJid }}"
       },
       "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
       "typeVersion": 1.5,
       "position": [
-        1760,
+        1824,
         176
       ],
       "id": "3fd11009-476c-485b-9bd4-888dee3db54f",
@@ -684,18 +365,1972 @@
     },
     {
       "parameters": {
+        "promptType": "define",
+        "text": "=Gere APENAS a mensagem final de notificação para o usuário.\n\nNome: {{ $json.name }}\nTarefa: {{ $('tarefas_pendentes').item.json.task_name }}\nHorário: {{ $('tarefas_pendentes').item.json.time }}\n",
+        "options": {
+          "systemMessage": "=### IDENTIDADE\n\nVocê é o Dimi, o assistente de produtividade que vive no WhatsApp.\nSeu jeito é leve, direto e prestativo. Seu mascote é um astronauta minimalista.\n\nVocê fala como um humano eficiente:\n\n- frases curtas\n- linguagem simples\n- levemente informal\n- simpático, mas objetivo\n- nunca robótico\n\nSua comunicação é amigável e profissional ao mesmo tempo.\nNunca use emojis.\n\n---\n\n### MISSÃO\n\nSua única função é gerar UMA mensagem de lembrete de tarefa.\n\nVocê NÃO conversa.\nVocê NÃO responde perguntas.\nVocê NÃO executa ações.\nVocê NÃO explica nada.\n\nVocê apenas escreve a notificação.\n\nPense em si como:\n→ \"gerador de lembretes curtos\", não \"assistente de chat\".\n\n---\n\n### REGRAS OBRIGATÓRIAS\n\n- Gere APENAS a mensagem final\n- Apenas 1 frase\n- Sem perguntas\n- Sem explicações extras\n- Sem múltiplos parágrafos\n- Sem emojis\n- Sem exclamações excessivas\n- Sem textos longos\n- Use no máximo 160 caracteres, se possível.\n\n---\n\n### CONTEÚDO\n\nUse SOMENTE os dados recebidos.\nNUNCA invente:\n\n- tarefas\n- horários\n- datas\n- informações adicionais\n\nSe algo não estiver nos dados, não mencione.\n\n---\n\n### TOM\n\nNatural, direto, humano e micro-incentivador.\n\nEvite:\n- dramatização\n- piadas\n- gírias\n- frases muito criativas\n- linguagem motivacional\n- parecer propaganda\n\nPrefira algo simples como uma mensagem entre amigos.\n\n---\n\n### FRASES PROIBIDAS\n\nNunca use:\n\n- \"está na hora\"\n- \"o tempo acabou\"\n- \"último aviso\"\n- cobranças agressivas\n- urgência artificial\n\nO workflow já decide o momento correto do envio.\n\nUse apenas linguagem de lembrete.\n\n---\n\nPADRÃO ESPERADO (EXEMPLOS DE ESTILO)\n\nCorretos:\n\"Ei João, lembra de comprar pão às 18:00.\"\n\"Maria, sua reunião é às 14:30. Boa reunião.\"\n\"Não esquece do treino às 20:00. Bom treino.\"\n\"Estudar às 19:00. Foco nisso.\"\n\"Consulta às 10:00. Vai dar tudo certo.\"\n\nErrados:\n\"Está na hora!!!\"\n\"Corre que vai atrasar\"\n\"Aqui está sua tarefa detalhada de hoje\"\n\"Você gostaria de fazer agora?\"\n\"Vamos mudar sua vida hoje\"\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1328,
+        -800
+      ],
+      "id": "af54ef70-5297-4311-aae0-7071da6800fc",
+      "name": "DimiLembre"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "profiles",
+        "limit": 1,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.user_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        -800
+      ],
+      "id": "c0824cc6-1844-4103-97c9-58c1f66a1eb1",
+      "name": "dados",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bsIWC5NX2iAVT0g0",
+          "name": "Supabase Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "task",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "notification_sent",
+              "condition": "eq",
+              "keyValue": "={{ false }}"
+            },
+            {
+              "keyName": "status",
+              "condition": "eq",
+              "keyValue": "Pendente"
+            },
+            {
+              "keyName": "date",
+              "condition": "eq",
+              "keyValue": "={{ $today.format('yyyy-MM-dd') }}"
+            },
+            {
+              "keyName": "time",
+              "condition": "lte",
+              "keyValue": "={{ $now.plus({minutes: 15}).format('HH:mm') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        400,
+        -800
+      ],
+      "id": "94b4d151-69e4-4a12-9ad9-e680f42b531b",
+      "name": "tarefas_pendentes",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bsIWC5NX2iAVT0g0",
+          "name": "Supabase Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "task",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "task_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Loop').item.json.task_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "notification_sent",
+              "fieldValue": "={{ true }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1872,
+        -800
+      ],
+      "id": "4b35b0fc-20e7-461c-8621-7c7a5f1e9ac7",
+      "name": "id_task_true",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bsIWC5NX2iAVT0g0",
+          "name": "Supabase Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "Dimi",
+        "remoteJid": "={{ $('dados').item.json.user_id }}",
+        "messageText": "={{ $json.output }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        1664,
+        -800
+      ],
+      "id": "db3b5482-71dd-4fa9-9811-ab3bff7a2252",
+      "name": "Enviar texto1",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ZaUgpg5vMAVfzHnW",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "task_notify",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "user_id",
+              "fieldValue": "={{ $json.user_id }}"
+            },
+            {
+              "fieldId": "task_id",
+              "fieldValue": "={{ $('EstaPendente').item.json.task_id }}"
+            },
+            {
+              "fieldId": "sent_at",
+              "fieldValue": "={{ $now }}"
+            },
+            {
+              "fieldId": "message_content",
+              "fieldValue": "={{ $('Enviar texto1').item.json.data.message.conversation }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        -800
+      ],
+      "id": "1f35c22a-e15f-40c7-966c-ecf2a5d526a9",
+      "name": "task_notify1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bsIWC5NX2iAVT0g0",
+          "name": "Supabase Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Lembrete de Task",
+        "height": 80,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        192,
+        -912
+      ],
+      "id": "c037b4c4-ce40-4c45-bd74-48e365b15b30",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Função Principal",
+        "height": 80,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        192,
+        -112
+      ],
+      "id": "5a4dba3c-22a5-4ae2-af15-b8f762df20ea",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        192,
+        -800
+      ],
+      "id": "0f07ea4c-995b-44f4-af08-989de685988b",
+      "name": "Lembrete Task"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "={{ $('Dados').first().json.instance }}",
+        "remoteJid": "={{ $('Dados').first().json.user_id }}",
+        "messageText": "={{ $json.output }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        3744,
+        768
+      ],
+      "id": "12cbba42-7956-46ad-9642-5fe209fe3766",
+      "name": "Resposta2",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ZaUgpg5vMAVfzHnW",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "={{ $('Dados').first().json.instance }}",
+        "remoteJid": "={{ $('Dados').first().json.user_id }}",
+        "messageText": "={{ $json.output }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        3072,
+        992
+      ],
+      "id": "be1a9af5-b959-498b-a944-d6ec01736445",
+      "name": "Resposta3",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ZaUgpg5vMAVfzHnW",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Dados').first().json.message }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=## PAPEL\n\nVocê é o **DimiCriador**.\n\nEspecialista exclusivo em **registrar novas tarefas**.\n\nSua responsabilidade é:\nextrair informações → consultar tarefas existentes → decidir a ação → retornar JSON estruturado.\n\nVocê pode usar a tool **consultar_tarefas** para ler tarefas existentes.\n\nVocê NÃO pode criar, editar ou apagar tarefas.\nVocê NÃO conversa.\nVocê NÃO escreve texto humano.\nVocê NÃO explica nada.\n\nVocê SEMPRE responde apenas JSON válido seguindo o Output Parser.\n\n---\n\n## USO DE TOOL (OBRIGATÓRIO)\n\nSempre que a intenção for criar tarefa:\n\n1. chamar consultar_tarefas\n2. analisar tarefas retornadas\n3. verificar duplicidade semântica\n4. decidir ação\n\nNunca decidir duplicidade sem consultar.\nNunca inventar dados.\n\n---\n\n## ESTILO INTERNO\n\nSeja:\n- direto\n- lógico\n- determinístico\n- objetivo\n\nNunca escrever nada fora do JSON.\n\n---\n\n## CONTEXTO TEMPORAL (OBRIGATÓRIO)\n\nData atual: {{ $now.format('yyyy-MM-dd') }}\nDia da semana: {{ $now.format('cccc') }}\nHora atual: {{ $now.format('HH:mm') }}\n\nRegras:\n- nunca usar datas passadas\n- sempre escolher próxima ocorrência futura\n\n---\n\n## INTERPRETAÇÃO DE DATAS\n\nConverter:\n\n- hoje → hoje\n- amanhã → +1 dia\n- depois de amanhã → +2 dias\n- dia da semana → próxima ocorrência futura\n\nSe o dia citado for hoje mas o horário já passou → próxima ocorrência.\n\n---\n\n## CONFIRMAÇÃO DE DIA DA SEMANA (CRÍTICO)\n\nSe o usuário disser apenas:\n\"segunda\", \"sexta\", \"terça\", etc.\n\nOu usar somente dia da semana sem data explícita:\n\n→ interpretar como próxima ocorrência futura\n→ MAS antes de criar, confirmar\n\nação = perguntar\npergunta = confirmação curta\n\nEx:\n\"Você quer dizer a próxima segunda?\"\n\"Essa sexta agora?\"\n\nNunca criar direto nesses casos.\n\n---\n\n## CLASSIFICAÇÃO\n\n### TAREFA SIMPLES\nNão exige horário.\n\nEx:\n- comprar\n- estudar\n- ligar\n- revisar\n- pagar conta\n\n→ hora opcional\n\nSe não informar data → pode usar hoje.\n\n---\n\n### COMPROMISSO COM HORÁRIO\nExige data + hora obrigatórias.\n\nEx:\n- médico\n- consulta\n- reunião\n- entrevista\n- prova\n- aula\n- viagem\n- evento\n- dentista\n- trabalho agendado\n- qualquer compromisso presencial ou com horário marcado\n\n---\n\n## BLOQUEIO ABSOLUTO (MUITO IMPORTANTE)\n\nPara COMPROMISSOS:\n\nSe faltar:\n- data\nou\n- hora\n\n→ PROIBIDO retornar \"criar\"\n\n→ ação = perguntar\n\nNunca:\n- assumir horário\n- assumir data\n- usar null\n- inferir horário padrão\n\nSempre perguntar explicitamente.\n\n---\n\n## DESCRIÇÃO MÍNIMA\n\nSe texto for genérico demais:\n\nEx:\n- \"médico\"\n- \"reunião\"\n- \"prova\"\n\n→ perguntar detalhe\n\nação = perguntar\n\n---\n\n## DUPLICIDADE\n\nApós consultar tarefas:\n\nSe houver tarefa com:\n- texto semelhante\n- mesma data\n- mesma hora\n\n→ ação = perguntar\n→ pergunta = confirmação de duplicidade\n\nNunca criar duplicado automaticamente.\n\n---\n\n## AÇÕES PERMITIDAS\n\nVocê só pode retornar:\n\n### criar\nQuando:\n- dados completos\n- não duplicado\n- sem ambiguidade\n\n### perguntar\nQuando:\n- faltar informação\n- faltar horário obrigatório\n- dia da semana ambíguo\n- texto genérico\n- possível duplicidade\n\n### ignorar\nQuando não for criação de tarefa.\n\n---\n\n## EXTRAÇÃO\n\ntexto → curto e claro\ndata → YYYY-MM-DD ou null\nhora → HH:mm ou null\n\nNunca incluir data ou hora dentro do texto.\n\n---\n\n## REGRA FINAL\n\nResponder SOMENTE JSON válido.\nSem frases.\nSem explicações.\nSem markdown.\nSem texto extra."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2816,
+        -416
+      ],
+      "id": "146b843d-551d-406f-adf0-532d5de4ce4c",
+      "name": "DimiCriador"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        3424,
+        944
+      ],
+      "id": "9069a2c6-0eb3-4164-a9da-04bb5766f872",
+      "name": "Consult",
+      "credentials": {
+        "openAiApi": {
+          "id": "M1k74G2IfkEITiZP",
+          "name": "Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Dados').first().json.message }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=### PAPEL\n\nVocê é o DimiEditor.\n\nEspecialista exclusivo em alterar tarefas existentes.\n\nSua única função é:\nidentificar a tarefa correta → aplicar a alteração → confirmar.\n\nVocê não cria novas tarefas.\nVocê não lista agendas completas.\nVocê não conversa.\nVocê não responde mensagens sociais.\n\nSe não for claramente uma edição, não prossiga.\n\n---\n\n### ESTILO\n\nRespostas:\n- curtas\n- claras\n- humanas\n- diretas\n- sem emojis\n- sem textos longos\n\n---\n\n### REGRA CRÍTICA (VERACIDADE)\n\nÉ PROIBIDO confirmar qualquer alteração sem sucesso da tool.\n\nNunca diga:\n\"marquei\", \"concluí\", \"adicionei\", \"cancelei\", \"adicionei nova data\"\n\nantes da tool retornar sucesso.\n\nOrdem obrigatória:\n1. chamar tool\n2. aguardar sucesso\n3. responder\n\nSe falhar:\nresponda naturalmente pedindo para repetir.\n\nEx:\n\"Tive uma interferência aqui. Pode repetir?\"\n\n---\n\n### CONTEXTO task_notify (PRIORIDADE MÁXIMA)\n\nO workflow pode enviar:\n\n- {{ $json.task_id }}\n- {{ $json.message_content }}\n- {{ $json.answered }}\n\nSe task_id existir E answered = false:\n\n→ essa é obrigatoriamente a tarefa alvo\n→ NÃO consultar histórico\n→ NÃO perguntar qual tarefa\n→ NÃO tentar adivinhar outra\n\nApós sucesso do atualizar_tarefa:\n→ chamar update_task_notify(answered=true)\n\n---\n\n### SEM task_notify\n\nSe não houver task_notify:\n\n1. consultar_tarefas (Pendentes)\n2. identificar semanticamente a tarefa\n\nSe houver ambiguidade:\n→ perguntar qual tarefa antes de alterar\n\nNunca alterar tarefa incerta.\n\n---\n\n### CONTEXTO TEMPORAL (OBRIGATÓRIO)\n\nData atual: {{ $now.format('yyyy-MM-dd') }}\nDia da semana: {{ $now.format('cccc') }}\nHora atual: {{ $now.format('HH:mm') }}\n\nUse sempre esse contexto para interpretar datas relativas.\nNunca usar datas passadas.\nNunca adivinhar.\n\n---\n\n### REGRAS DE INTERPRETAÇÃO DE DATA\n\nPara alterações de data/hora:\n\n- hoje → data atual\n- amanhã → +1 dia\n- depois de amanhã → +2 dias\n- dia da semana → próxima ocorrência futura\n- se horário já passou hoje → próxima ocorrência\n- nunca agendar no passado\n\nSempre escolher a próxima data futura válida.\n\n---\n\n### AÇÕES PERMITIDAS\n\nConcluir:\nstatus = Concluída\n\nCancelar:\nstatus = Cancelada\n\nAdiar / remarcar:\nnova data/hora\nnotification_sent = false\n\n---\n\n### RESPOSTA\n\nSempre mencionar o nome da tarefa.\nSer curto e direto.\n\nExemplos:\n\"Marquei Academia como concluída.\"\n\"Adiei a reunião para amanhã às 14h.\"\n\"Cancelado o lembrete de pagar conta.\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2784,
+        176
+      ],
+      "id": "9cb232f5-e1f3-4181-ae8d-cb0c87676f33",
+      "name": "DimiEditor"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Dados').first().json.message }}",
+        "options": {
+          "systemMessage": "=### PAPEL\n\nVocê é o DimiConsultor.\n\nEspecialista exclusivo em formatar e exibir tarefas.\n\nSua única função é:\nreceber a lista de tarefas já fornecida pelo sistema → organizar → formatar → responder.\n\nVocê NÃO consulta banco.\nVocê NÃO chama tools.\nVocê NÃO cria.\nVocê NÃO edita.\nVocê NÃO conversa livremente.\nVocê NÃO explica o sistema.\n\nApenas formata os dados recebidos.\n\n---\n\n### FONTE DOS DADOS (CRÍTICO)\n\nAs tarefas chegam em {{ $json.tasks_text }}.\nUse exatamente essas linhas.\nNunca invente.\n\nCada item contém:\n- task_id\n- task_name\n- date\n- time\n- status\n\n\nUse SOMENTE esses dados.\n\nNunca inventar.\nNunca assumir.\nNunca buscar novamente.\n\n---\n\n### ESTILO\n\nRespostas:\n- curtas\n- claras\n- organizadas\n- diretas\n- humanas\n- sem emojis\n- sem textos longos\n\n---\n\n### CONTEXTO TEMPORAL (OBRIGATÓRIO)\n\nData atual: {{ $now.format('yyyy-MM-dd') }}\nDia da semana: {{ $now.format('cccc') }}\nHora atual: {{ $now.format('HH:mm') }}\n\nUse esse contexto para interpretar:\n- hoje\n- amanhã\n- semana\n- mês\n\nNunca usar datas passadas.\n\n---\n\n### FILTRAGEM\n\nConsiderar apenas tarefas recebidas.\n\nElas já estão filtradas como:\nstatus = Pendentes\n\nVocê apenas aplica o período solicitado:\n- hoje\n- amanhã\n- semana\n- mês\n- todas\n\n---\n\n### REGRA CRÍTICA (ANTI-RESUMO)\n\nListe TODAS as tarefas recebidas.\n\nProibido:\n- resumir\n- omitir\n- agrupar\n- mostrar parcialmente\n- mostrar só a primeira\n\nSe vierem 10 → listar 10\nSe vier 1 → listar 1\n\n---\n\n### ORDENAÇÃO\n\nOrdenar por:\n1. data crescente\n2. hora crescente (null por último)\n\n---\n\n### FORMATAÇÃO\n\nUma tarefa por linha:\n\n• Nome às 14h\n• Nome às 14h \n...\n\nRegras:\n- horário humano (08h, 14h30)\n- se não tiver horário → não mostrar hora\n- nunca usar formato técnico\n\n---\n\n### REGRA DE EXIBIÇÃO DE DATA (OBRIGATÓRIA)\n\nA exibição da data segue regra fixa e determinística:\n\n- consulta \"hoje\" → NÃO mostrar data\n- consulta \"amanhã\" → NÃO mostrar data\n- consulta \"semana\" → SEMPRE mostrar dia/mês\n- consulta \"mês\" → SEMPRE mostrar dia/mês\n- consulta \"todas/agenda\" → SEMPRE mostrar dia/mês\n\nNunca decidir automaticamente.\nNunca omitir datas quando for semana/mês/todas.\nNunca variar o formato.\n\nFormato obrigatório quando mostrar:\nDD/MM\n\nExemplos:\n• Médico às 10h em 09/02\n• Aula de surf às 16h em 11/02\n\n---\n\n### TÍTULOS\n\n- hoje → \"Para hoje:\"\n- amanhã → \"Para amanhã:\"\n- semana → \"Próximos dias:\"\n- mês → \"Este mês:\"\n- todas → \"Suas tarefas pendentes:\"\n\n### SEM TAREFAS\n\nSe não houver resultados:\n\n\"Nada pendente.\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        3424,
+        768
+      ],
+      "id": "94e07b7e-2b19-435f-90b9-d4f3cc614064",
+      "name": "DimiConsultor"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d3542d65-36b3-41f8-944e-c6e77bf0af91",
+              "leftValue": "={{ $json.status_assinatura }}",
+              "rightValue": "bloqueado",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "c3646367-1784-4317-90ec-56109e713705",
+              "leftValue": "={{ $json.whatsapp_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1104,
+        0
+      ],
+      "id": "25dc35ca-1146-4b67-ad4f-95ed16f2d73b",
+      "name": "StatusAssinatura"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c7d0572d-c011-4f8a-86ed-17b40a37bf71",
+              "leftValue": "={{ $json.user_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1312,
+        128
+      ],
+      "id": "195c8a3b-f970-4f5e-9f35-d7490cb13a5f",
+      "name": "TemCadastro"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        2768,
+        1168
+      ],
+      "id": "b25d102e-6109-4ae3-bc73-12fa54508763",
+      "name": "Suport",
+      "credentials": {
+        "openAiApi": {
+          "id": "M1k74G2IfkEITiZP",
+          "name": "Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        2784,
+        432
+      ],
+      "id": "b2b672f5-74a9-4217-acb2-965acbe50465",
+      "name": "Edit",
+      "credentials": {
+        "openAiApi": {
+          "id": "M1k74G2IfkEITiZP",
+          "name": "Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1696,
+        128
+      ],
+      "id": "212cdd1b-007e-4cf9-acb6-f3124988b0f2",
+      "name": "Register",
+      "credentials": {
+        "openAiApi": {
+          "id": "M1k74G2IfkEITiZP",
+          "name": "Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        2064,
+        512
+      ],
+      "id": "ad62dc26-b45c-45b4-b197-9377512bb6da",
+      "name": "Intentions",
+      "credentials": {
+        "openAiApi": {
+          "id": "L2QrGOThx3AR0hfD",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.categoria }}",
+                    "rightValue": "CRIAR",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "bb6fd9f0-e131-4b8f-a8b8-ec751f79ccf7"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "647fd2be-cf1e-4bd8-aa29-407bd597980b",
+                    "leftValue": "={{ $json.output.categoria }}",
+                    "rightValue": "EDITAR",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d7ad7bbd-ec13-4562-a252-961e49599352",
+                    "leftValue": "={{ $json.output.categoria }}",
+                    "rightValue": "CONSULTAR",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "6acc4d08-bbbd-4432-b80e-a304dd4d53d0",
+                    "leftValue": "={{ $json.output.categoria }}",
+                    "rightValue": "SOCIAL",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        2400,
+        320
+      ],
+      "id": "039b15b8-2394-4b87-b3cc-78a92c15aa61",
+      "name": "Intenção"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        880,
+        -816
+      ],
+      "id": "419b2187-a0e1-49e1-b1d5-30de79c1e2da",
+      "name": "Loop"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1328,
+        -576
+      ],
+      "id": "d0f5fff3-b7b4-4fd9-8a03-f7f44d5758bd",
+      "name": "Reminder",
+      "credentials": {
+        "openAiApi": {
+          "id": "M1k74G2IfkEITiZP",
+          "name": "Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "19671761-297e-4b18-8512-5ad6a056713c",
+              "leftValue": "={{ $json.time }}",
+              "rightValue": "",
+              "operator": {
+                "type": "dateTime",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "5a28387c-914c-4a81-94fb-eca5f00b4b47",
+              "leftValue": "={{ $json.date }}",
+              "rightValue": "={{ $now.format('yyyy-MM-dd') }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "7f1197d3-8eea-44ba-a6e2-13a34725b862",
+              "leftValue": "={{ $json.notification_sent }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "788f14df-9628-4cbb-b5d7-1cd3fe564b05",
+              "leftValue": "={{ $json.time }}",
+              "rightValue": "={{ $now.format('HH:mm') }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "after"
+              }
+            },
+            {
+              "id": "d403618f-0ddb-41a7-ae1c-94a60e6cf13f",
+              "leftValue": "={{ $json.time }}",
+              "rightValue": "={{ $now.plus({minutes: 15}).format('HH:mm') }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "beforeOrEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        608,
+        -800
+      ],
+      "id": "3982b40b-9bff-41ee-9fdf-50cc24769ca0",
+      "name": "EstaPendente"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Está tool é para consultar todos os dados necessários do usuário no banco de dados",
+        "operation": "getAll",
+        "tableId": "task",
+        "limit": 1,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Dados').item.json.user_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        3008,
+        432
+      ],
+      "id": "cbae4602-f82e-4d18-ac88-41958bf112e6",
+      "name": "consultar_tarefas1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bsIWC5NX2iAVT0g0",
+          "name": "Supabase Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Dados').first().json.message }}",
+        "options": {
+          "systemMessage": "=### PAPEL\n\nVocê é o DimiSocial.\n\nModo social do Dimi.\n\nSua única função é responder mensagens sociais de forma humana, leve e simpática.\n\nVocê NÃO executa ações.\nVocê NÃO chama tools.\nVocê NÃO cria, edita ou consulta tarefas.\nVocê NÃO explica o sistema.\nVocê NÃO ensina comandos.\n\nApenas converse naturalmente.\n\n---\n\n### CONTEXTO\n\nVocê só recebe mensagens já classificadas como SOCIAL.\n\nPortanto, sempre responda normalmente.\n\nNunca tente detectar intenção operacional.\n\n---\n\n### ESTILO OBRIGATÓRIO\n\nRespostas devem ser:\n- humanas\n- leves\n- simpáticas\n- naturais\n- no máximo 1 frase curta\n- linguagem simples\n- levemente informal\n- nunca robóticas ou técnicas\n\nUse o nome do usuário quando fizer sentido:\n{{ $('Dados').first().json.nome }}\n\nSoar como um amigo falando no WhatsApp.\n\n---\n\n### COMPORTAMENTO\n\nVocê pode:\n- cumprimentar\n- agradecer\n- reagir educadamente\n- puxar conversa leve\n- ocasionalmente fazer uma pergunta simples sobre o dia\n\nPerguntas devem ser:\n- sutis\n- naturais\n- sem explicar funcionalidades\n- sem instruções\n- sem parecer tutorial\n\n---\n\n### PROIBIDO\n\nNunca:\n- falar sobre tarefas, sistema ou funcionalidades\n- ensinar comandos\n- dar instruções\n- redirecionar fluxo\n- parecer robô\n\n---\n\n### REGRAS FINAIS\n\n- Responda com apenas 1 frase\n- 3 a 15 palavras\n- varie naturalmente as respostas\n- soe humano\n\n### EXEMPLOS DE RESPOSTA (REFERÊNCIA DE TOM)\n\nUse estes exemplos apenas como inspiração de estilo.\nNunca copiar exatamente. Varie naturalmente.\n\n\"Bom dia, {{ $('Dados').first().json.nome }}. Quais são os planos pra hoje?\"\n\"Oi, {{ $('Dados').first().json.nome }}! Tudo certo por aí?\"\n\"Boa tarde, {{ $('Dados').first().json.nome }}. Como tá o dia?\"\n\"Boa noite, {{ $('Dados').first().json.nome }}. Dia rendeu bem?\"\n\"Valeu, {{ $('Dados').first().json.nome }}! Tamo junto.\"\n\"Imagina, {{ $('Dados').first().json.nome }}. Sempre por aqui.\"\n\"Tranquilo, {{ $('Dados').first().json.nome }}.\"\n\"Show, {{ $('Dados').first().json.nome }}!\"\n\"Obrigado você, {{ $('Dados').first().json.nome }}.\"\n\"E aí, {{ $('Dados').first().json.nome }}, como as coisas estão indo?\"\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2768,
+        992
+      ],
+      "id": "a3add0cb-e28e-4b8b-a7a0-d6b590fd176c",
+      "name": "DimiSocial"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        3136,
+        -64
+      ],
+      "id": "98715d64-3b63-439b-93ff-57119f2f7758",
+      "name": "Parser",
+      "credentials": {
+        "openAiApi": {
+          "id": "L2QrGOThx3AR0hfD",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"acao\": {\n      \"type\": \"string\",\n      \"enum\": [\"criar\", \"perguntar\", \"ignorar\"]\n    },\n    \"texto\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"data\": {\n      \"type\": [\"string\", \"null\"],\n      \"pattern\": \"^\\\\d{4}-\\\\d{2}-\\\\d{2}$\"\n    },\n    \"hora\": {\n      \"type\": [\"string\", \"null\"],\n      \"pattern\": \"^\\\\d{2}:\\\\d{2}$\"\n    },\n    \"pergunta\": {\n      \"type\": [\"string\", \"null\"]\n    }\n  },\n  \"required\": [\"acao\", \"texto\", \"data\", \"hora\", \"pergunta\"]\n}\n",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        3136,
+        -176
+      ],
+      "id": "3180bf99-534b-4cfb-b553-f38f89a1eaad",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"acao\": {\n      \"type\": \"string\",\n      \"enum\": [\"editar\", \"perguntar\", \"ignorar\"]\n    },\n    \"task_id\": {\n      \"type\": [\"number\", \"null\"]\n    },\n    \"task_name\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"status\": {\n      \"type\": [\"string\", \"null\"],\n      \"enum\": [\"Concluída\", \"Cancelada\", null]\n    },\n    \"data\": {\n      \"type\": [\"string\", \"null\"],\n      \"pattern\": \"^\\\\d{4}-\\\\d{2}-\\\\d{2}$\"\n    },\n    \"hora\": {\n      \"type\": [\"string\", \"null\"],\n      \"pattern\": \"^\\\\d{2}:\\\\d{2}$\"\n    },\n    \"pergunta\": {\n      \"type\": [\"string\", \"null\"]\n    }\n  },\n  \"required\": [\n    \"acao\",\n    \"task_id\",\n    \"task_name\",\n    \"status\",\n    \"data\",\n    \"hora\",\n    \"pergunta\"\n  ]\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        3136,
+        432
+      ],
+      "id": "799fd044-83ce-467c-9690-482f6365a8f3",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        3136,
+        592
+      ],
+      "id": "903f3193-b508-418f-86bf-6f9a609b9230",
+      "name": "Parser1",
+      "credentials": {
+        "openAiApi": {
+          "id": "L2QrGOThx3AR0hfD",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Dados').item.json.user_id }}",
+        "sessionTTL": 600
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.5,
+      "position": [
+        2880,
+        -176
+      ],
+      "id": "9d76c727-7339-4173-b7fe-fab5e39fd7a5",
+      "name": "Memory",
+      "credentials": {
+        "redis": {
+          "id": "Fapm8d5ddu151NUq",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
         "sessionIdType": "customKey",
         "sessionKey": "={{ $('Dados').first().json.user_id }}",
+        "sessionTTL": 600
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.5,
+      "position": [
+        2880,
+        432
+      ],
+      "id": "e4448273-1e90-4cd6-8915-6959e471fb25",
+      "name": "Memory1",
+      "credentials": {
+        "redis": {
+          "id": "Fapm8d5ddu151NUq",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Dados').item.json.user_id }}",
         "sessionTTL": 300
       },
       "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
       "typeVersion": 1.5,
       "position": [
+        2864,
+        1168
+      ],
+      "id": "30ad3ba2-8c58-4c4e-9a6d-8e8340988582",
+      "name": "Memory2",
+      "credentials": {
+        "redis": {
+          "id": "Fapm8d5ddu151NUq",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "task",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "task_id",
+              "fieldValue": "={{ Math.floor(Math.random() * 100000).toString() }}"
+            },
+            {
+              "fieldId": "user_id",
+              "fieldValue": "={{ $('Dados').first().json.user_id }}"
+            },
+            {
+              "fieldId": "task_name",
+              "fieldValue": "={{ $json.output.texto }}"
+            },
+            {
+              "fieldId": "date",
+              "fieldValue": "={{ $json.output.data }}"
+            },
+            {
+              "fieldId": "time",
+              "fieldValue": "={{ $json.output.hora }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "Pendente"
+            },
+            {
+              "fieldId": "notification_sent",
+              "fieldValue": "={{ false }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3488,
+        -480
+      ],
+      "id": "df00fd29-e4fd-4995-8514-df714371ee77",
+      "name": "nova_tarefa",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bsIWC5NX2iAVT0g0",
+          "name": "Supabase Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.acao }}",
+                    "rightValue": "criar",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "d87fd470-d8a0-4444-8890-e5099f6ae4e6"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "37e27e85-e074-4731-bd84-fc1fcb895939",
+                    "leftValue": "={{ $json.output.acao }}",
+                    "rightValue": "ignorar",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "00f3f96a-bcd5-4226-bfff-f296b2994c43",
+                    "leftValue": "={{ $json.output.acao }}",
+                    "rightValue": "perguntar",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        3168,
+        -432
+      ],
+      "id": "d0cc1d2e-11b1-4e38-b698-2b1b600051ee",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "={{ $('Dados').first().json.instance }}",
+        "remoteJid": "={{ $('Dados').first().json.user_id }}",
+        "messageText": "={{ $('DimiCriador').item.json.output.pergunta }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        4128,
+        -304
+      ],
+      "id": "96a10a53-8aaa-495e-9147-2df06d3b8f2e",
+      "name": "Pergunta",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ZaUgpg5vMAVfzHnW",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "={{ $('Dados').first().json.instance }}",
+        "remoteJid": "={{ $('Dados').first().json.user_id }}",
+        "messageText": "={{ $json.msg }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        4128,
+        -480
+      ],
+      "id": "4d68e002-b1be-4c8d-a919-4e991d7cc653",
+      "name": "Confirmação Da Task",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ZaUgpg5vMAVfzHnW",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const texto = $('nova_tarefa').first().json.task_name;\nconst data = $('nova_tarefa').first().json.date;\nconst hora = $('nova_tarefa').first().json.time;\n\nconst d = new Date(data + \"T00:00:00\");\nconst hoje = new Date();\n\nhoje.setHours(0,0,0,0);\n\nconst diff = Math.round((d - hoje) / 86400000);\n\nlet dia;\n\n// hoje / amanhã\nif (diff === 0) dia = \"hoje\";\nelse if (diff === 1) dia = \"amanhã\";\n\n// até 7 dias → nome do dia\nelse if (diff <= 7) {\n  dia = d.toLocaleDateString('pt-BR', { weekday: 'long' });\n}\n\n// mais distante → dd/mm\nelse {\n  dia = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });\n}\n\nlet msg;\n\nif (hora) {\n  const [h, m] = hora.split(':');\n  const horaFormatada = m === '00' ? `${h}h` : `${h}h${m}`;\n  msg = `Anotado: ${texto} ${dia} às ${horaFormatada}`;\n} else {\n  msg = `Anotado: ${texto} ${dia}`;\n}\n\nreturn [{ msg }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3904,
+        -480
+      ],
+      "id": "3955eaef-64da-430a-a39e-6f60fef4692d",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Dados').first().json.message }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=### PAPEL\n\nVocê é o Classificador de Intenções do sistema Dimi.\n\nSua única função é analisar a mensagem do usuário\ne retornar a categoria correta.\n\nVocê NÃO conversa.\nVocê NÃO explica.\nVocê NÃO executa ações.\nVocê NÃO adiciona texto extra.\n\nVocê responde SOMENTE JSON válido conforme o Output Parser.\n\n---\n\n### CONTEXTO DE ESTADO (PRIORIDADE MÁXIMA)\n\nO sistema pode enviar:\n\n- {{ $json.awaiting_response }} (boolean)\n- {{ $json.pending_agent }} (string)\n\nSe {{ $json.awaiting_response }} = {{ true }}:\n\n→ NÃO analisar a mensagem\n→ NÃO classificar semanticamente\n→ continuar o fluxo atual\n\nMapeamento obrigatório:\n{{ $json.pending_agent }} = CRIAR → CRIAR\n{{ $json.pending_agent }} = EDITAR → EDITAR\n{{ $json.pending_agent }} = CONSULTAR → CONSULTAR\n\nEssa regra tem PRIORIDADE ABSOLUTA.\n\nMensagens curtas como:\n\"10h\", \"sim\", \"ok\", \"amanhã\", \"pode\"\n\nDEVEM continuar o fluxo.\n\nNunca retornar SOCIAL nesse caso.\n\n---\n\n### CONTEXTO (task_notify)\n\nO workflow pode enviar:\n\n- {{ $('task_notify').item.json.task_id }}\n- {{ $('task_notify').item.json.answered }}\n- \n\nSe {{ $('task_notify').item.json.task_id }} existir E {{ $('task_notify').item.json.answered }} = {{ false }}, existe um lembrete ativo (task_notify).:\n\nNÃO classifique automaticamente como EDITAR.\n\nO lembrete é apenas informativo.\n\nClassifique como EDITAR SOMENTE se houver intenção clara de modificação.\n\nExemplos que são EDITAR:\n\"feito\"\n\"já fiz\"\n\"concluído\"\n\"cancela\"\n\"adiar pra amanhã\"\n\"remarcar\"\n\"muda pra 10h\"\n\nRespostas sociais como:\n\"ok\"\n\"valeu\"\n\"obrigado\"\n\"👍\"\n\ncontinuam sendo SOCIAL.\n\n---\n\n### REGRAS DE CLASSIFICAÇÃO\n\nCRIAR\n→ nova tarefa\n→ compromisso futuro\n→ ação futura\n→ verbos no futuro\n→ datas/horários/períodos\n\nEx:\n\"comprar pão\"\n\"reunião 14h\"\n\"estudar amanhã\"\n\"sexta dentista\"\n\n---\n\nEDITAR\n→ alterar tarefa existente\n→ concluir\n→ cancelar\n→ adiar\n→ remarcar\n→ modificar data ou horário\n\n---\n\nCONSULTAR\n→ visualizar agenda ou tarefas\n→ listar, mostrar, revisar, status\n\nEx:\n\"o que tenho hoje\"\n\"agenda de amanhã\"\n\"minhas tarefas\"\n\"me mostra a semana\"\n\n---\n\nSOCIAL\n→ conversa casual sem intenção de produtividade\n→ cumprimentos\n→ agradecimentos\n→ respostas educadas\n→ reações\n\nEx:\n\"oi\"\n\"bom dia\"\n\"valeu\"\n\"obrigado\"\n\"kkk\"\n\"👍\"\n\nSOCIAL é ausência total de ação operacional.\n\n---\n\n### PRIORIDADE FINAL\n\n1) {{ $json.awaiting_response }} = {{ true }} → continuar fluxo atual\n2) intenção explícita de editar → EDITAR\n3) ação futura → CRIAR\n4) consulta → CONSULTAR\n5) restante → SOCIAL\n\n---\n\n### REGRA FINAL\n\nResponder SOMENTE JSON válido.\nSem frases.\nSem explicações.\nSem markdown."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2064,
+        352
+      ],
+      "id": "cb5792d5-d54b-4796-8878-5d78e4a34e1d",
+      "name": "Classificador de Intenções"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        2784,
+        -176
+      ],
+      "id": "004a6221-787d-4d85-9026-15af1d3c9a67",
+      "name": "Create",
+      "credentials": {
+        "openAiApi": {
+          "id": "M1k74G2IfkEITiZP",
+          "name": "Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "user_state",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "keyValue": "={{ $('Dados').first().json.user_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
         1856,
+        352
+      ],
+      "id": "039b0344-896f-4fb5-9078-9cd6c2eced37",
+      "name": "user_state",
+      "retryOnFail": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "bsIWC5NX2iAVT0g0",
+          "name": "Supabase Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "01c6bd91-fdf7-4d1e-a87e-93a6f2164b12",
+              "leftValue": "={{$json.user_id}}",
+              "rightValue": 0,
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3696,
+        -192
+      ],
+      "id": "e3bb5e8b-3abb-4022-992e-f7c91726587f",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "={{ $('Dados').first().json.instance }}",
+        "remoteJid": "={{ $('Dados').first().json.user_id }}",
+        "messageText": "={{ $('DimiCriador').item.json.output.pergunta }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        4128,
+        -112
+      ],
+      "id": "6bef40f1-c87c-49ae-a9ea-5392d016c36c",
+      "name": "Pergunta1",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ZaUgpg5vMAVfzHnW",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "user_state",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "keyValue": "={{ $('Dados').first().json.user_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3488,
+        -192
+      ],
+      "id": "da2ae4db-46fe-4920-bc92-bdd743c154a9",
+      "name": "awaiting_response",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "bsIWC5NX2iAVT0g0",
+          "name": "Supabase Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "user_state",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Dados').first().json.user_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "awaiting_response",
+              "fieldValue": "={{ true }}"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{ $now }}"
+            },
+            {
+              "fieldId": "pending_agent",
+              "fieldValue": "CRIAR"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3904,
+        -112
+      ],
+      "id": "83a1147a-f274-4252-a5ed-332f6727e504",
+      "name": "awaiting_response_true1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bsIWC5NX2iAVT0g0",
+          "name": "Supabase Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "user_state",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "user_id",
+              "fieldValue": "={{ $('Dados').first().json.user_id }}"
+            },
+            {
+              "fieldId": "awaiting_response",
+              "fieldValue": "={{ true }}"
+            },
+            {
+              "fieldId": "pending_agent",
+              "fieldValue": "CRIAR"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{ $now }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3904,
+        -304
+      ],
+      "id": "8125c31e-a2c2-4208-8348-8c51542aa747",
+      "name": "awaiting_response_true",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bsIWC5NX2iAVT0g0",
+          "name": "Supabase Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "user_state",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Dados').first().json.user_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "awaiting_response",
+              "fieldValue": "={{ false }}"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{ $now }}"
+            },
+            {
+              "fieldId": "pending_agent",
+              "fieldValue": "null"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3696,
+        -480
+      ],
+      "id": "9093c7a5-95b8-42b7-a5f1-3d795189b117",
+      "name": "awaiting_response_false",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "bsIWC5NX2iAVT0g0",
+          "name": "Supabase Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"categoria\": {\n      \"type\": \"string\",\n      \"enum\": [\"CRIAR\", \"EDITAR\", \"CONSULTAR\", \"SOCIAL\"]\n    }\n  },\n  \"required\": [\"categoria\"]\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        2224,
         512
       ],
-      "id": "40d0e3b5-ebc2-4124-9f90-c71cf12dc5e4",
-      "name": "Memory",
+      "id": "219a00d7-d36b-4d1e-9ef4-67f5fa906496",
+      "name": "Structured Output Parser2"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.acao }}",
+                    "rightValue": "editar",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "d87fd470-d8a0-4444-8890-e5099f6ae4e6"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "37e27e85-e074-4731-bd84-fc1fcb895939",
+                    "leftValue": "={{ $json.output.acao }}",
+                    "rightValue": "ignorar",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "00f3f96a-bcd5-4226-bfff-f296b2994c43",
+                    "leftValue": "={{ $json.output.acao }}",
+                    "rightValue": "perguntar",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        3168,
+        160
+      ],
+      "id": "e2c11b23-a917-4cbd-b06c-f6b60c1f3346",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "={{ $('Dados').first().json.instance }}",
+        "remoteJid": "={{ $('Dados').first().json.user_id }}",
+        "messageText": "={{ $('DimiCriador').item.json.output.pergunta }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        4128,
+        288
+      ],
+      "id": "48e30df9-34c6-4cb6-9377-f4a41def92bb",
+      "name": "Pergunta2",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ZaUgpg5vMAVfzHnW",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const texto = $('DimiEditor').first().json.output.task_name;\nconst status = $('DimiEditor').first().json.output.status;\nconst data = $('DimiEditor').first().json.output.data;\nconst hora = $('DimiEditor').first().json.output.hora;\n\nlet msg;\n\n// ===== concluir =====\nif (status === \"Concluída\") {\n  msg = `Marquei ${texto} como concluída.`;\n}\n\n// ===== cancelar =====\nelse if (status === \"Cancelada\") {\n  msg = `Cancelei ${texto}.`;\n}\n\n// ===== formatar data (se existir) =====\nlet dia = null;\n\nif (data) {\n  const d = new Date(data + \"T00:00:00\");\n  const hoje = new Date();\n  hoje.setHours(0,0,0,0);\n\n  const diff = Math.round((d - hoje) / 86400000);\n\n  if (diff === 0) dia = \"hoje\";\n  else if (diff === 1) dia = \"amanhã\";\n  else if (diff <= 7) dia = d.toLocaleDateString('pt-BR', { weekday: 'long' });\n  else dia = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });\n}\n\n// ===== formatar hora (se existir) =====\nlet horaFormatada = null;\n\nif (hora) {\n  const [h, m] = hora.split(':');\n  horaFormatada = m === '00' ? `${h}h` : `${h}h${m}`;\n}\n\n// ===== remarcar casos =====\nif (!msg) {\n  if (dia && horaFormatada) {\n    msg = `Remarquei ${texto} para ${dia} às ${horaFormatada}.`;\n  }\n  else if (dia) {\n    msg = `Remarquei ${texto} para ${dia}.`;\n  }\n  else if (horaFormatada) {\n    msg = `Atualizei ${texto} para ${horaFormatada}.`;\n  }\n  else {\n    msg = `Atualizei ${texto}.`;\n  }\n}\n\nreturn [{ msg }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4128,
+        112
+      ],
+      "id": "d946edc8-b602-40f8-86c0-11dd248bede2",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "01c6bd91-fdf7-4d1e-a87e-93a6f2164b12",
+              "leftValue": "={{$json.user_id}}",
+              "rightValue": 0,
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3696,
+        400
+      ],
+      "id": "07615464-980d-498b-a648-b5abd4fb0de4",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "={{ $('Dados').first().json.instance }}",
+        "remoteJid": "={{ $('Dados').first().json.user_id }}",
+        "messageText": "={{ $('DimiCriador').item.json.output.pergunta }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        4128,
+        480
+      ],
+      "id": "fbe5a10f-7ba8-48ba-80c4-a780bc4d72bb",
+      "name": "Pergunta3",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ZaUgpg5vMAVfzHnW",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "user_state",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "keyValue": "={{ $('Dados').first().json.user_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3488,
+        400
+      ],
+      "id": "5b37f616-f168-4954-8b6e-8e724cdaee18",
+      "name": "awaiting_response1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "bsIWC5NX2iAVT0g0",
+          "name": "Supabase Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "user_state",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Dados').first().json.user_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "awaiting_response",
+              "fieldValue": "={{ true }}"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{ $now }}"
+            },
+            {
+              "fieldId": "pending_agent",
+              "fieldValue": "CRIAR"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3904,
+        480
+      ],
+      "id": "f8822a45-e7de-47d8-bb8e-011128447621",
+      "name": "awaiting_response_true2",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bsIWC5NX2iAVT0g0",
+          "name": "Supabase Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "user_state",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "user_id",
+              "fieldValue": "={{ $('Dados').first().json.user_id }}"
+            },
+            {
+              "fieldId": "awaiting_response",
+              "fieldValue": "={{ true }}"
+            },
+            {
+              "fieldId": "pending_agent",
+              "fieldValue": "CRIAR"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{ $now }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3904,
+        288
+      ],
+      "id": "732a0c87-0326-4a25-aec9-d6979be8314a",
+      "name": "awaiting_response_true3",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bsIWC5NX2iAVT0g0",
+          "name": "Supabase Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "user_state",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Dados').first().json.user_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "awaiting_response",
+              "fieldValue": "={{ false }}"
+            },
+            {
+              "fieldId": "updated_at",
+              "fieldValue": "={{ $now }}"
+            },
+            {
+              "fieldId": "pending_agent",
+              "fieldValue": "null"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3904,
+        112
+      ],
+      "id": "a5791476-9063-4cf8-8b59-6c927f9baf1b",
+      "name": "awaiting_response_false1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "bsIWC5NX2iAVT0g0",
+          "name": "Supabase Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "={{ $('Dados').first().json.instance }}",
+        "remoteJid": "={{ $('Dados').first().json.user_id }}",
+        "messageText": "={{ $json.msg }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        4368,
+        112
+      ],
+      "id": "e4ae42be-f6ee-42a9-9aba-192597412ccf",
+      "name": "Confirmação da Atualização",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ZaUgpg5vMAVfzHnW",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "task_notify",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "task_id",
+              "condition": "eq",
+              "keyValue": "={{ $('DimiEditor').first().json.output.task_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "answered",
+              "fieldValue": "={{ true }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3696,
+        112
+      ],
+      "id": "6663bcf7-6b9d-4867-9f7c-9da40092255b",
+      "name": "update_task_notify",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bsIWC5NX2iAVT0g0",
+          "name": "Supabase Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "task",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "task_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.output.task_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "date",
+              "fieldValue": "={{ $json.output.data ?? undefined }}"
+            },
+            {
+              "fieldId": "time",
+              "fieldValue": "={{ $json.output.hora ?? undefined }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "={{ $json.output.status ?? undefined }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3488,
+        112
+      ],
+      "id": "95f791ba-19c0-4427-a4a9-5e275ab814d4",
+      "name": "atualizar_tarefa",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bsIWC5NX2iAVT0g0",
+          "name": "Supabase Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "task",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Dados').first().json.user_id }}"
+            },
+            {
+              "keyName": "status",
+              "condition": "eq",
+              "keyValue": "Pendente"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2768,
+        768
+      ],
+      "id": "5ed73a30-ce3b-42f6-a836-f57871ef419f",
+      "name": "consultar_tarefas2",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "bsIWC5NX2iAVT0g0",
+          "name": "Supabase Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  tasks: $input.all().map(i => i.json)\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2976,
+        768
+      ],
+      "id": "7fed0e2c-b02c-41f3-bb56-0d2d5b7b1005",
+      "name": "Agrupar"
+    },
+    {
+      "parameters": {
+        "jsCode": "const tasks = $input.first().json.tasks || [];\n\nconst tasksText = tasks.map(t =>\n  `${t.task_name} | ${t.date} | ${t.time}`\n).join('\\n');\n\nreturn [{\n  tasks_text: tasksText\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3200,
+        768
+      ],
+      "id": "f12a28ba-be1d-472b-8cd3-cf37b3077ed9",
+      "name": "organizar_tasks"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Dados').first().json.user_id }}",
+        "sessionTTL": 400
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.5,
+      "position": [
+        3536,
+        944
+      ],
+      "id": "91de9a91-ad72-47fc-af8f-91e656e4be35",
+      "name": "Memory3",
       "credentials": {
         "redis": {
           "id": "Fapm8d5ddu151NUq",
@@ -717,24 +2352,6 @@
         ]
       ]
     },
-    "If": {
-      "main": [
-        [
-          {
-            "node": "DimiCadastro",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "task_notify",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "DimiCadastro": {
       "main": [
         [
@@ -746,40 +2363,11 @@
         ]
       ]
     },
-    "DimiTarefas": {
-      "main": [
-        [
-          {
-            "node": "Resposta",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Dados": {
       "main": [
         [
           {
-            "node": "If1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "If1": {
-      "main": [
-        [
-          {
-            "node": "Enviar texto",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "If",
+            "node": "StatusAssinatura",
             "type": "main",
             "index": 0
           }
@@ -808,33 +2396,11 @@
         ]
       ]
     },
-    "nova_tarefa": {
-      "ai_tool": [
-        [
-          {
-            "node": "DimiTarefas",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "consultar_tarefas": {
       "ai_tool": [
         [
           {
-            "node": "DimiTarefas",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "atualizar_tarefa": {
-      "ai_tool": [
-        [
-          {
-            "node": "DimiTarefas",
+            "node": "DimiCriador",
             "type": "ai_tool",
             "index": 0
           }
@@ -845,41 +2411,8 @@
       "main": [
         [
           {
-            "node": "DimiTarefas",
+            "node": "user_state",
             "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "update_task_notify": {
-      "ai_tool": [
-        [
-          {
-            "node": "DimiTarefas",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Modelo Dimi Tarefas": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "DimiTarefas",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Modelo Dimi Cadastro": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "DimiCadastro",
-            "type": "ai_languageModel",
             "index": 0
           }
         ]
@@ -907,11 +2440,676 @@
         ]
       ]
     },
+    "DimiLembre": {
+      "main": [
+        [
+          {
+            "node": "Enviar texto1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "dados": {
+      "main": [
+        [
+          {
+            "node": "DimiLembre",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "tarefas_pendentes": {
+      "main": [
+        [
+          {
+            "node": "EstaPendente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "id_task_true": {
+      "main": [
+        [
+          {
+            "node": "task_notify1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar texto1": {
+      "main": [
+        [
+          {
+            "node": "id_task_true",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "task_notify1": {
+      "main": [
+        [
+          {
+            "node": "Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lembrete Task": {
+      "main": [
+        [
+          {
+            "node": "tarefas_pendentes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DimiCriador": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consult": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "DimiConsultor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DimiEditor": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DimiConsultor": {
+      "main": [
+        [
+          {
+            "node": "Resposta2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "StatusAssinatura": {
+      "main": [
+        [
+          {
+            "node": "Enviar texto",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "TemCadastro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TemCadastro": {
+      "main": [
+        [
+          {
+            "node": "DimiCadastro",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "task_notify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Suport": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "DimiSocial",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "DimiEditor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Register": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "DimiCadastro",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intentions": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Classificador de Intenções",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intenção": {
+      "main": [
+        [
+          {
+            "node": "DimiCriador",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DimiEditor",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "consultar_tarefas2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DimiSocial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop": {
+      "main": [
+        [],
+        [
+          {
+            "node": "dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reminder": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "DimiLembre",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EstaPendente": {
+      "main": [
+        [
+          {
+            "node": "Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "consultar_tarefas1": {
+      "ai_tool": [
+        [
+          {
+            "node": "DimiEditor",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DimiSocial": {
+      "main": [
+        [
+          {
+            "node": "Resposta3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parser": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "DimiCriador",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "DimiEditor",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parser1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Memory": {
       "ai_memory": [
         [
           {
-            "node": "DimiTarefas",
+            "node": "DimiCriador",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "DimiEditor",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory2": {
+      "ai_memory": [
+        [
+          {
+            "node": "DimiSocial",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "nova_tarefa": {
+      "main": [
+        [
+          {
+            "node": "awaiting_response_false",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "nova_tarefa",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "awaiting_response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Confirmação Da Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pergunta": {
+      "main": [
+        []
+      ]
+    },
+    "Classificador de Intenções": {
+      "main": [
+        [
+          {
+            "node": "Intenção",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "DimiCriador",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "user_state": {
+      "main": [
+        [
+          {
+            "node": "Classificador de Intenções",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "awaiting_response_true",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "awaiting_response_true1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "awaiting_response": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "awaiting_response_true1": {
+      "main": [
+        [
+          {
+            "node": "Pergunta1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "awaiting_response_true": {
+      "main": [
+        [
+          {
+            "node": "Pergunta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "awaiting_response_false": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Classificador de Intenções",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "atualizar_tarefa",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "awaiting_response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Confirmação da Atualização",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "awaiting_response_true3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "awaiting_response_true2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "awaiting_response1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "awaiting_response_true2": {
+      "main": [
+        [
+          {
+            "node": "Pergunta3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "awaiting_response_true3": {
+      "main": [
+        [
+          {
+            "node": "Pergunta2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "awaiting_response_false1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update_task_notify": {
+      "main": [
+        [
+          {
+            "node": "awaiting_response_false1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "atualizar_tarefa": {
+      "main": [
+        [
+          {
+            "node": "update_task_notify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "consultar_tarefas2": {
+      "main": [
+        [
+          {
+            "node": "Agrupar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agrupar": {
+      "main": [
+        [
+          {
+            "node": "organizar_tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "organizar_tasks": {
+      "main": [
+        [
+          {
+            "node": "DimiConsultor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory3": {
+      "ai_memory": [
+        [
+          {
+            "node": "DimiConsultor",
             "type": "ai_memory",
             "index": 0
           }
@@ -919,12 +3117,12 @@
       ]
     }
   },
-  "active": true,
+  "active": false,
   "settings": {
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "9e5d0d7d-f898-4b8b-9f98-3e09661c7f6f",
+  "versionId": "83940855-eeee-42f2-a8f8-bfd961a56f1f",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "3ecacd7c0e2cc43ed1297c4f6c5a3a71082a877830167910132a526dbd30d990"
