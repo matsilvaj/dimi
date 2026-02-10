@@ -1,12 +1,13 @@
-import './App.css'
+import { Navbar } from './components/Navbar';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <header>
-    </header>
-  )
+    <div className="landing-page">
+      <Navbar />
+      {/* Futuras seções */}
+    </div>
+  );
 }
 
-export default App
+export default App;
