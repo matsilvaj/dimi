@@ -1,0 +1,74 @@
+.hero {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 150px;
+  text-align: center;
+}
+
+.hero-container {
+  max-width: 800px;
+  width: 100%;
+  padding: 40px 20px;
+}
+
+.hero-title {
+  font-size: 4rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  line-height: 1.1;
+  letter-spacing: -2px;
+  margin-bottom: 24px;
+}
+
+.hero-title span {
+  color: #2563EB;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  color: #4b5563;
+  max-width: 600px;
+  margin: 0 auto 40px auto;
+  line-height: 1.6;
+}
+
+.btn-hero-cta {
+  background-color: #2563EB;
+  color: white;
+  border: none;
+  padding: 16px 32px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
+}
+
+.btn-hero-cta:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.8rem;
+    letter-spacing: -1px;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .btn-hero-cta {
+    width: 100%; /* Botão ocupa toda a largura no celular */
+    justify-content: center;
+    padding: 14px 24px;
+  }
+}
