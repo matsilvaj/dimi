@@ -47,6 +47,7 @@
   gap: 10px;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
+  text-decoration: none
 }
 
 .btn-hero-cta:hover {
@@ -67,7 +68,6 @@
   }
 
   .btn-hero-cta {
-    width: 100%; /* Botão ocupa toda a largura no celular */
     justify-content: center;
     padding: 14px 24px;
   }

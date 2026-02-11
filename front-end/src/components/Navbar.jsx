@@ -1,50 +1,74 @@
 import { useState } from 'react';
 import { LayoutDashboard, Rocket, CreditCard, Menu, X } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 
 export function Navbar() {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  
+  // URL de Cadastro (WhatsApp)
+  const whatsappUrl = "https://api.whatsapp.com/send/?phone=5571983578489&text=Ol%C3%A1+Dimi%21%21&type=phone_number&app_absent=0";
 
-    return (
-        <nav className="navbar">
-            {/* Lado Esquerdo: Logo */}
-            <div className="nav-logo">
-                <a href="/">Dimi</a>
-            </div>
+  const scrollToSection = (e, id) => {
+    e.preventDefault();
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+    if (isMenuOpen) setIsMenuOpen(false);
+  };
 
-            <div className="navbar-container">
-                {/* Centro: Links de Navegação */}
-                <ul className="nav-links">
-                    <li><a href="#features"><Rocket size={18} /> Features</a></li>
-                    <li><a href="#dashboard"><LayoutDashboard size={18} /> Dashboard</a></li>
-                    <li><a href="#planos"><CreditCard size={18} /> Planos</a></li>
-                </ul>
-            </div>
+  return (
+    <nav className="navbar">
+      <div className="nav-logo">
+        <Link to="/">Dimi</Link>
+      </div>
 
-            {/* Lado Direito: Ações */}
-            <div className="nav-actions">
-                <button className="btn-login"><span>Entrar</span></button>
-                <button className="btn-signup"><span>Cadastrar</span></button>
+      <div className="navbar-container">
+        <ul className="nav-links">
+          <li><a href="#features" onClick={(e) => scrollToSection(e, 'features')}><Rocket size={18} /> Features</a></li>
+          <li><a href="#dashboard" onClick={(e) => scrollToSection(e, 'dashboard')}><LayoutDashboard size={18} /> Dashboard</a></li>
+          <li><a href="#planos" onClick={(e) => scrollToSection(e, 'planos')}><CreditCard size={18} /> Planos</a></li>
+        </ul>
+      </div>
 
-                {/* Botão de Menu - Alterna entre ícone Menu e X */}
-                <button className="btn-mobile-menu" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                    {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                </button>
-            </div>
+      <div className="nav-actions">
+        <button className="btn-login" onClick={() => navigate('/login')}>
+          <span>Entrar</span>
+        </button>
 
-            {/* Menu Mobile - Aparece apenas quando isMenuOpen é true */}
-            {isMenuOpen && (
-                <div className="mobile-menu-overlay">
-                    <ul className="mobile-nav-links">
-                        <li><a href="#features" onClick={() => setIsMenuOpen(false)}>Features</a></li>
-                        <li><a href="#dashboard" onClick={() => setIsMenuOpen(false)}>Dashboard</a></li>
-                        <li><a href="#planos" onClick={() => setIsMenuOpen(false)}>Planos</a></li>
-                        <hr />
-                        <li><button className="mobile-btn-login">Entrar</button></li>
-                        <li><button className="mobile-btn-signup">Cadastrar</button></li>
-                    </ul>
-                </div>
-            )}
-        </nav>
-    );
+        {/* Link de Cadastro via WhatsApp */}
+        <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="btn-signup">
+          <span>Cadastrar</span>
+        </a>
+
+        <button className="btn-mobile-menu" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
+
+      {isMenuOpen && (
+        <div className="mobile-menu-overlay">
+          <ul className="mobile-nav-links">
+            <li><a href="#features" onClick={(e) => scrollToSection(e, 'features')}>Features</a></li>
+            <li><a href="#dashboard" onClick={(e) => scrollToSection(e, 'dashboard')}>Dashboard</a></li>
+            <li><a href="#planos" onClick={(e) => scrollToSection(e, 'planos')}>Planos</a></li>
+            <hr />
+            <li>
+              <button className="mobile-btn-login" onClick={() => { navigate('/login'); setIsMenuOpen(false); }}>
+                Entrar
+              </button>
+            </li>
+            <li>
+              {/* Cadastro Mobile */}
+              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="mobile-btn-signup">
+                Cadastrar
+              </a>
+            </li>
+          </ul>
+        </div>
+      )}
+    </nav>
+  );
 }

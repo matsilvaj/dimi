@@ -1,7 +1,8 @@
-import { ArrowRight } from 'lucide-react';
 import './Hero.css';
 
 export function Hero() {
+  const whatsappUrl = "https://api.whatsapp.com/send/?phone=5571983578489&text=Ol%C3%A1+Dimi%21%21&type=phone_number&app_absent=0";
+
   return (
     <section className="hero">
       <div className="hero-container">
@@ -13,10 +14,9 @@ export function Hero() {
           O Dimi integra suas tarefas ao WhatsApp para você nunca mais esquecer o que é importante.
         </p>
         
-        {/* Novo Botão CTA */}
-        <button className="btn-hero-cta">
+        <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="btn-hero-cta">
           Começar gratuitamente
-        </button>
+        </a>
       </div>
     </section>
   );

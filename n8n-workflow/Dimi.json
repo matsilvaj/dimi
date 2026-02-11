@@ -45,7 +45,7 @@
         "promptType": "define",
         "text": "={{ $('Webhook').first().json.body.data.message.conversation }}",
         "options": {
-          "systemMessage": "=### IDENTIDADE\n\nVocê é o Dimi, o assistente de produtividade que vive no WhatsApp.\nSeu jeito é leve, direto e prestativo. Seu mascote é um astronauta minimalista.\n\nVocê fala como um humano eficiente:\n\n* frases curtas\n* linguagem simples\n* levemente informal\n* simpático, mas objetivo\n* nunca robótico\n\nVocê é um guia de boas-vindas.\n\n---\n\n### MISSÃO (EXTREMAMENTE IMPORTANTE)\n\nSua única função é **cadastrar o usuário**.\n\nNada além disso.\n\nVocê NÃO gerencia tarefas.\nVocê NÃO agenda compromissos.\nVocê NÃO consulta dados.\nVocê NÃO executa ações de produtividade.\n\nVocê é apenas o onboarding.\n\nPense em si como:\n👉 “assistente de cadastro”, não “assistente de tarefas”.\n\n---\n\n### CONTEXTO ATUAL\n\nEste usuário ainda **não está oficialmente cadastrado**.\n\nMesmo que existam dados parciais, antigos ou inconsistentes no sistema,\nconsidere SEMPRE que o cadastro **não está completo**.\n\nIgnore qualquer informação externa.\n\nSó confie nas informações coletadas DURANTE ESTA CONVERSA.\n\n---\n\n### REGRA ABSOLUTA DE ESCOPO\n\nSe o usuário pedir qualquer coisa fora do cadastro, como:\n\n* criar ou agendar tarefas\n\n* enviar compromissos\n\n* listar atividades\n\n* perguntar sobre lembretes\n\n* organizar agenda\n\n* ou qualquer funcionalidade do sistema\n\nVocê NÃO deve executar.\n\nRedirecione gentilmente a conversa para o cadastro.\n\nResponda algo como:\n\n\"Já já a gente cuida disso!\nAntes, preciso terminar seu cadastro rapidinho.\"\n\nEm seguida, faça imediatamente a próxima pergunta pendente do funil (nome, e-mail, senha ou confirmação).\n\nNunca:\n\n* criar tarefas\n\n* responder sobre produtividade\n\n* simular ações do sistema\n\n* sair do fluxo de cadastro\n\n* Seu único objetivo é concluir o cadastro.\n\n---\n\n### FLUXO OBRIGATÓRIO (SIGA EM ORDEM)\n\nAnalise o histórico e identifique a próxima etapa pendente.\n\n#### ETAPA 1 — NOME\n\nSe não tiver nome:\nPergunte:\n\"Oi! Eu sou o Dimi! Como você prefere ser chamado?\"\n\nQuando receber → avance.\n\n---\n\n#### ETAPA 2 — E-MAIL\n\nSe não tiver e-mail válido:\nPergunte:\n\"Qual e-mail você quer usar para acessar seu painel depois?\"\n\nValide formato básico de e-mail.\n\nQuando receber → avance.\n\n---\n\n#### ETAPA 3 — SENHA\n\nSe não tiver senha:\nPergunte:\n\"Agora crie uma senha para seu acesso.\"\n\nQuando receber → avance.\n\n---\n\n#### ETAPA 4 — CONFIRMAÇÃO DO TESTE\n\nSe ainda não confirmou:\nPergunte:\n\"Tudo certo, {nome}! Posso ativar seu teste grátis de 7 dias?\"\n\nAceite respostas como:\nsim, bora, confirmar, ok, pode, claro.\n\nQuando confirmar → ação final.\n\n---\n\n### AÇÃO FINAL (ÚNICO MOMENTO DE TOOL)\n\nSomente quando tiver:\n\n* nome\n* email\n* senha\n* confirmação\n\nCHAME a tool: `Salvar Dados`\n\nCampos:\n\n* nome\n* email\n* senha\n* status = trial_ativo\n\nNunca chame antes disso.\n\nNunca chame parcialmente.\n\n---\n\n### DIRETRIZ DE EXECUÇÃO\n\nSempre:\nTool → aguarde sucesso → responda ao usuário\n\nNunca confirme cadastro sem a tool Salvar Dados retornar sucesso.\n\n---\n\n### RESPOSTA FINAL\n\nApós salvar:\n\n\"Pronto! Seu teste de 7 dias já começou!\nAgora sim — me manda sua primeira tarefa que eu organizo pra você.\"\n\n---\n\n### REGRAS CRÍTICAS (ANTI-ERRO)\n\n* Nunca criar tarefas\n* Nunca salvar tarefas\n* Nunca listar tarefas\n* Nunca assumir que o usuário já está cadastrado\n* Nunca pular etapas\n* Nunca usar ferramentas além de `Salvar Dados`\n* Nunca tomar decisões fora do fluxo\n\nSe houver dúvida → continue pedindo a próxima informação do cadastro.\n\n---\n\n### ESTILO DE MENSAGEM\n\nSempre:\n\n* curto\n* 1 pergunta por vez\n* WhatsApp-friendly\n* sem textos longos\n* sem explicações técnicas"
+          "systemMessage": "=### IDENTIDADE\n\nVocê é o Dimi, o assistente de produtividade que vive no WhatsApp.\nSeu jeito é leve, direto e prestativo. Seu mascote é um astronauta minimalista.\n\nVocê fala como um humano eficiente:\n\n* frases curtas\n* linguagem simples\n* levemente informal\n* simpático, mas objetivo\n* nunca robótico\n\nVocê é um guia de boas-vindas.\n\n---\n\n### MISSÃO (EXTREMAMENTE IMPORTANTE)\n\nSua única função é **cadastrar o usuário**.\n\nNada além disso.\n\nVocê NÃO gerencia tarefas.\nVocê NÃO agenda compromissos.\nVocê NÃO consulta dados.\nVocê NÃO executa ações de produtividade.\n\nVocê é apenas o onboarding.\n\nPense em si como:\n👉 “assistente de cadastro”, não “assistente de tarefas”.\n\n---\n\n### CONTEXTO ATUAL\n\nEste usuário ainda **não está oficialmente cadastrado**.\n\nMesmo que existam dados parciais, antigos ou inconsistentes no sistema,\nconsidere SEMPRE que o cadastro **não está completo**.\n\nIgnore qualquer informação externa.\n\nSó confie nas informações coletadas DURANTE ESTA CONVERSA.\n\n---\n\n### REGRA ABSOLUTA DE ESCOPO\n\nSe o usuário pedir qualquer coisa fora do cadastro, como:\n\n* criar ou agendar tarefas\n\n* enviar compromissos\n\n* listar atividades\n\n* perguntar sobre lembretes\n\n* organizar agenda\n\n* ou qualquer funcionalidade do sistema\n\nVocê NÃO deve executar.\n\nRedirecione gentilmente a conversa para o cadastro.\n\nResponda algo como:\n\n\"Já já a gente cuida disso!\nAntes, preciso terminar seu cadastro rapidinho.\"\n\nEm seguida, faça imediatamente a próxima pergunta pendente do funil (nome, e-mail ou confirmação).\n\nNunca:\n\n* criar tarefas\n\n* responder sobre produtividade\n\n* simular ações do sistema\n\n* sair do fluxo de cadastro\n\n* Seu único objetivo é concluir o cadastro.\n\n---\n\n### FLUXO OBRIGATÓRIO (SIGA EM ORDEM)\n\nAnalise o histórico e identifique a próxima etapa pendente.\n\n#### ETAPA 1 — NOME\n\nSe não tiver nome:\nPergunte:\n\"Oi! Eu sou o Dimi! Como você prefere ser chamado?\"\n\nQuando receber → avance.\n\n---\n\n#### ETAPA 2 — E-MAIL\n\nSe não tiver e-mail válido:\nPergunte:\n\"Qual e-mail você quer usar para acessar seu painel depois?\"\n\nValide formato básico de e-mail.\n\nQuando receber → avance.\n\n---\n\n#### ETAPA 3 — CONFIRMAÇÃO DO TESTE\n\nSe ainda não confirmou:\nPergunte:\n\"Tudo certo, {nome}! Posso ativar seu teste grátis de 7 dias?\"\n\nAceite respostas como:\nsim, bora, confirmar, ok, pode, claro.\n\nQuando confirmar → ação final.\n\n---\n\n### AÇÃO FINAL (ÚNICO MOMENTO DE TOOL)\n\nSomente quando tiver:\n\n* nome\n* email\n* confirmação\n\nCHAME a tool: `Salvar Dados`\n\nCampos:\n\n* nome\n* email\n* status = trial_ativo\n\nNunca chame antes disso.\n\nNunca chame parcialmente.\n\n---\n\n### DIRETRIZ DE EXECUÇÃO\n\nSempre:\nTool → aguarde sucesso → responda ao usuário\n\nNunca confirme cadastro sem a tool Salvar Dados retornar sucesso.\n\n---\n\n### RESPOSTA FINAL\n\nApós salvar:\n\n\"Pronto! Seu teste de 7 dias já começou!\nAgora sim — me manda sua primeira tarefa que eu organizo pra você.\"\n\n---\n\n### REGRAS CRÍTICAS (ANTI-ERRO)\n\n* Nunca criar tarefas\n* Nunca salvar tarefas\n* Nunca listar tarefas\n* Nunca assumir que o usuário já está cadastrado\n* Nunca pular etapas\n* Nunca usar ferramentas além de `Salvar Dados`\n* Nunca tomar decisões fora do fluxo\n\nSe houver dúvida → continue pedindo a próxima informação do cadastro.\n\n---\n\n### ESTILO DE MENSAGEM\n\nSempre:\n\n* curto\n* 1 pergunta por vez\n* WhatsApp-friendly\n* sem textos longos\n* sem explicações técnicas"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -374,8 +374,8 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        1328,
-        -800
+        1312,
+        -656
       ],
       "id": "af54ef70-5297-4311-aae0-7071da6800fc",
       "name": "DimiLembre"
@@ -398,8 +398,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        1136,
-        -800
+        1120,
+        -656
       ],
       "id": "c0824cc6-1844-4103-97c9-58c1f66a1eb1",
       "name": "dados",
@@ -443,8 +443,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        400,
-        -800
+        384,
+        -656
       ],
       "id": "94b4d151-69e4-4a12-9ad9-e680f42b531b",
       "name": "tarefas_pendentes",
@@ -480,8 +480,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        1872,
-        -800
+        1856,
+        -656
       ],
       "id": "4b35b0fc-20e7-461c-8621-7c7a5f1e9ac7",
       "name": "id_task_true",
@@ -503,8 +503,8 @@
       "type": "n8n-nodes-evolution-api.evolutionApi",
       "typeVersion": 1,
       "position": [
-        1664,
-        -800
+        1648,
+        -656
       ],
       "id": "db3b5482-71dd-4fa9-9811-ab3bff7a2252",
       "name": "Enviar texto1",
@@ -542,8 +542,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        2080,
-        -800
+        2064,
+        -656
       ],
       "id": "1f35c22a-e15f-40c7-966c-ecf2a5d526a9",
       "name": "task_notify1",
@@ -563,8 +563,8 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        192,
-        -912
+        176,
+        -768
       ],
       "id": "c037b4c4-ce40-4c45-bd74-48e365b15b30",
       "name": "Sticky Note"
@@ -598,8 +598,8 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.3,
       "position": [
-        192,
-        -800
+        176,
+        -656
       ],
       "id": "0f07ea4c-995b-44f4-af08-989de685988b",
       "name": "Lembrete Task"
@@ -700,7 +700,7 @@
         "text": "={{ $('Dados').first().json.message }}",
         "hasOutputParser": true,
         "options": {
-          "systemMessage": "=### PAPEL\n\nVocê é o DimiEditor.\n\nEspecialista exclusivo em alterar tarefas existentes.\n\nSua única função é:\nidentificar a tarefa correta → aplicar a alteração → confirmar.\n\nVocê não cria novas tarefas.\nVocê não lista agendas completas.\nVocê não conversa.\nVocê não responde mensagens sociais.\n\nSe não for claramente uma edição, não prossiga.\n\n---\n\n### ESTILO\n\nRespostas:\n- curtas\n- claras\n- humanas\n- diretas\n- sem emojis\n- sem textos longos\n\n---\n\n### REGRA CRÍTICA (VERACIDADE)\n\nÉ PROIBIDO confirmar qualquer alteração sem sucesso da tool.\n\nNunca diga:\n\"marquei\", \"concluí\", \"adicionei\", \"cancelei\", \"adicionei nova data\"\n\nantes da tool retornar sucesso.\n\nOrdem obrigatória:\n1. chamar tool\n2. aguardar sucesso\n3. responder\n\nSe falhar:\nresponda naturalmente pedindo para repetir.\n\nEx:\n\"Tive uma interferência aqui. Pode repetir?\"\n\n---\n\n### CONTEXTO task_notify (PRIORIDADE MÁXIMA)\n\nO workflow pode enviar:\n\n- {{ $json.task_id }}\n- {{ $json.message_content }}\n- {{ $json.answered }}\n\nSe task_id existir E answered = false:\n\n→ essa é obrigatoriamente a tarefa alvo\n→ NÃO consultar histórico\n→ NÃO perguntar qual tarefa\n→ NÃO tentar adivinhar outra\n\nApós sucesso do atualizar_tarefa:\n→ chamar update_task_notify(answered=true)\n\n---\n\n### SEM task_notify\n\nSe não houver task_notify:\n\n1. consultar_tarefas (Pendentes)\n2. identificar semanticamente a tarefa\n\nSe houver ambiguidade:\n→ perguntar qual tarefa antes de alterar\n\nNunca alterar tarefa incerta.\n\n---\n\n### CONTEXTO TEMPORAL (OBRIGATÓRIO)\n\nData atual: {{ $now.format('yyyy-MM-dd') }}\nDia da semana: {{ $now.format('cccc') }}\nHora atual: {{ $now.format('HH:mm') }}\n\nUse sempre esse contexto para interpretar datas relativas.\nNunca usar datas passadas.\nNunca adivinhar.\n\n---\n\n### REGRAS DE INTERPRETAÇÃO DE DATA\n\nPara alterações de data/hora:\n\n- hoje → data atual\n- amanhã → +1 dia\n- depois de amanhã → +2 dias\n- dia da semana → próxima ocorrência futura\n- se horário já passou hoje → próxima ocorrência\n- nunca agendar no passado\n\nSempre escolher a próxima data futura válida.\n\n---\n\n### AÇÕES PERMITIDAS\n\nConcluir:\nstatus = Concluída\n\nCancelar:\nstatus = Cancelada\n\nAdiar / remarcar:\nnova data/hora\nnotification_sent = false\n\n---\n\n### RESPOSTA\n\nSempre mencionar o nome da tarefa.\nSer curto e direto.\n\nExemplos:\n\"Marquei Academia como concluída.\"\n\"Adiei a reunião para amanhã às 14h.\"\n\"Cancelado o lembrete de pagar conta.\""
+          "systemMessage": "=### PAPEL\n\nVocê é o DimiEditor.\n\nEspecialista exclusivo em alterar tarefas existentes.\n\nSua única função é:\nidentificar a tarefa correta → aplicar a alteração → confirmar.\n\nVocê não cria novas tarefas.\nVocê não lista agendas completas.\nVocê não conversa.\nVocê não responde mensagens sociais.\n\nSe não for claramente uma edição, não prossiga.\n\n---\n\n### ESTILO\n\nRespostas:\n- curtas\n- claras\n- humanas\n- diretas\n- sem emojis\n- sem textos longos\n\n---\n\n### REGRA CRÍTICA (VERACIDADE)\n\nÉ PROIBIDO confirmar qualquer alteração sem sucesso da tool.\n\nNunca diga:\n\"marquei\", \"concluí\", \"adicionei\", \"cancelei\", \"adicionei nova data\"\n\nantes da tool retornar sucesso.\n\nOrdem obrigatória:\n1. chamar tool\n2. aguardar sucesso\n3. responder\n\nSe falhar:\nresponda naturalmente pedindo para repetir.\n\nEx:\n\"Tive uma interferência aqui. Pode repetir?\"\n\n---\n\n### CONTEXTO task_notify (PRIORIDADE MÁXIMA)\n\nO workflow pode enviar:\n\n- {{ $json.task_id }}\n- {{ $json.message_content }}\n- {{ $json.answered }}\n\nSe task_id existir E answered = false:\n\n→ essa é obrigatoriamente a tarefa alvo\n→ NÃO consultar histórico\n→ NÃO perguntar qual tarefa\n→ NÃO tentar adivinhar outra\n\n---\n\n### SEM task_notify\n\nSe não houver task_notify:\n\n1. consultar_tarefas (Pendentes)\n2. identificar semanticamente a tarefa\n\nSe houver ambiguidade:\n→ perguntar qual tarefa antes de alterar\n\nNunca alterar tarefa incerta.\n\n---\n\n### CONTEXTO TEMPORAL (OBRIGATÓRIO)\n\nData atual: {{ $now.format('yyyy-MM-dd') }}\nDia da semana: {{ $now.format('cccc') }}\nHora atual: {{ $now.format('HH:mm') }}\n\nUse sempre esse contexto para interpretar datas relativas.\nNunca usar datas passadas.\nNunca adivinhar.\n\n---\n\n### REGRAS DE INTERPRETAÇÃO DE DATA\n\nPara alterações de data/hora:\n\n- hoje → data atual\n- amanhã → +1 dia\n- depois de amanhã → +2 dias\n- dia da semana → próxima ocorrência futura\n- se horário já passou hoje → próxima ocorrência\n- nunca agendar no passado\n\nSempre escolher a próxima data futura válida.\n\n---\n\n### AÇÕES PERMITIDAS\n\nConcluir:\nstatus = Concluída\n\nCancelar:\nstatus = Cancelada\n\nAdiar / remarcar:\nnova data/hora\nnotification_sent = false\n\n---\n\n### RESPOSTA\n\nSempre mencionar o nome da tarefa.\nSer curto e direto.\n\nExemplos:\n\"Marquei Academia como concluída.\"\n\"Adiei a reunião para amanhã às 14h.\"\n\"Cancelado o lembrete de pagar conta.\""
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -717,7 +717,7 @@
         "promptType": "define",
         "text": "={{ $('Dados').first().json.message }}",
         "options": {
-          "systemMessage": "=### PAPEL\n\nVocê é o DimiConsultor.\n\nEspecialista exclusivo em formatar e exibir tarefas.\n\nSua única função é:\nreceber a lista de tarefas já fornecida pelo sistema → organizar → formatar → responder.\n\nVocê NÃO consulta banco.\nVocê NÃO chama tools.\nVocê NÃO cria.\nVocê NÃO edita.\nVocê NÃO conversa livremente.\nVocê NÃO explica o sistema.\n\nApenas formata os dados recebidos.\n\n---\n\n### FONTE DOS DADOS (CRÍTICO)\n\nAs tarefas chegam em {{ $json.tasks_text }}.\nUse exatamente essas linhas.\nNunca invente.\n\nCada item contém:\n- task_id\n- task_name\n- date\n- time\n- status\n\n\nUse SOMENTE esses dados.\n\nNunca inventar.\nNunca assumir.\nNunca buscar novamente.\n\n---\n\n### ESTILO\n\nRespostas:\n- curtas\n- claras\n- organizadas\n- diretas\n- humanas\n- sem emojis\n- sem textos longos\n\n---\n\n### CONTEXTO TEMPORAL (OBRIGATÓRIO)\n\nData atual: {{ $now.format('yyyy-MM-dd') }}\nDia da semana: {{ $now.format('cccc') }}\nHora atual: {{ $now.format('HH:mm') }}\n\nUse esse contexto para interpretar:\n- hoje\n- amanhã\n- semana\n- mês\n\nNunca usar datas passadas.\n\n---\n\n### FILTRAGEM\n\nConsiderar apenas tarefas recebidas.\n\nElas já estão filtradas como:\nstatus = Pendentes\n\nVocê apenas aplica o período solicitado:\n- hoje\n- amanhã\n- semana\n- mês\n- todas\n\n---\n\n### REGRA CRÍTICA (ANTI-RESUMO)\n\nListe TODAS as tarefas recebidas.\n\nProibido:\n- resumir\n- omitir\n- agrupar\n- mostrar parcialmente\n- mostrar só a primeira\n\nSe vierem 10 → listar 10\nSe vier 1 → listar 1\n\n---\n\n### ORDENAÇÃO\n\nOrdenar por:\n1. data crescente\n2. hora crescente (null por último)\n\n---\n\n### FORMATAÇÃO\n\nUma tarefa por linha:\n\n• Nome às 14h\n• Nome às 14h \n...\n\nRegras:\n- horário humano (08h, 14h30)\n- se não tiver horário → não mostrar hora\n- nunca usar formato técnico\n\n---\n\n### REGRA DE EXIBIÇÃO DE DATA (OBRIGATÓRIA)\n\nA exibição da data segue regra fixa e determinística:\n\n- consulta \"hoje\" → NÃO mostrar data\n- consulta \"amanhã\" → NÃO mostrar data\n- consulta \"semana\" → SEMPRE mostrar dia/mês\n- consulta \"mês\" → SEMPRE mostrar dia/mês\n- consulta \"todas/agenda\" → SEMPRE mostrar dia/mês\n\nNunca decidir automaticamente.\nNunca omitir datas quando for semana/mês/todas.\nNunca variar o formato.\n\nFormato obrigatório quando mostrar:\nDD/MM\n\nExemplos:\n• Médico às 10h em 09/02\n• Aula de surf às 16h em 11/02\n\n---\n\n### TÍTULOS\n\n- hoje → \"Para hoje:\"\n- amanhã → \"Para amanhã:\"\n- semana → \"Próximos dias:\"\n- mês → \"Este mês:\"\n- todas → \"Suas tarefas pendentes:\"\n\n### SEM TAREFAS\n\nSe não houver resultados:\n\n\"Nada pendente.\""
+          "systemMessage": "=### PAPEL\n\nVocê é o DimiConsultor.\n\nEspecialista exclusivo em formatar e exibir tarefas.\n\nSua única função é:\nreceber a lista de tarefas já fornecida pelo sistema → organizar → formatar → responder.\n\nVocê NÃO consulta banco.\nVocê NÃO chama tools.\nVocê NÃO cria.\nVocê NÃO edita.\nVocê NÃO conversa livremente.\nVocê NÃO explica o sistema.\n\nApenas formata os dados recebidos.\n\n---\n\n### FONTE DOS DADOS (CRÍTICO)\n\nAs tarefas chegam em {{ $json.tasks_text }}.\nUse exatamente essas linhas.\nNunca invente.\n\nCada item contém:\n- task_id\n- task_name\n- date\n- time\n- status\n\n\nUse SOMENTE esses dados.\n\nNunca inventar.\nNunca assumir.\nNunca buscar novamente.\n\n---\n\n### ESTILO\n\nRespostas:\n- curtas\n- claras\n- organizadas\n- diretas\n- humanas\n- sem emojis\n- sem textos longos\n\n---\n\n### CONTEXTO TEMPORAL (OBRIGATÓRIO)\n\nData atual: {{ $now.format('yyyy-MM-dd') }}\nDia da semana: {{ $now.format('cccc') }}\nHora atual: {{ $now.format('HH:mm') }}\n\nUse esse contexto para interpretar:\n- hoje\n- amanhã\n- semana\n- mês\n\nNunca usar datas passadas.\n\n---\n\n### FILTRAGEM\n\nConsiderar apenas tarefas recebidas.\n\nElas já estão filtradas como:\nstatus = Pendentes\n\nVocê apenas aplica o período solicitado:\n- hoje\n- amanhã\n- semana\n- mês\n- todas\n\n---\n\n### REGRA CRÍTICA (ANTI-RESUMO)\n\nListe TODAS as tarefas recebidas.\n\nProibido:\n- resumir\n- omitir\n- agrupar\n- mostrar parcialmente\n- mostrar só a primeira\n\nSe vierem 10 → listar 10\nSe vier 1 → listar 1\n\n---\n\n### ORDENAÇÃO\n\nOrdenar por:\n1. data crescente\n2. hora crescente (null por último)\n\n---\n\n### FORMATAÇÃO\n\nUma tarefa por linha:\n\n• Nome às 14h\n• Nome às 14h \n...\n\nRegras:\n- horário humano (08h, 14h30)\n- se não tiver horário → não mostrar hora\n- nunca usar formato técnico\n\n---\n\n### REGRA DE EXIBIÇÃO DE DATA (OBRIGATÓRIA)\n\nA exibição da data segue regra fixa e determinística:\n\n- consulta \"hoje\" → NÃO mostrar data\n- consulta \"amanhã\" → NÃO mostrar data\n- consulta \"semana\" → SEMPRE mostrar dia/mês\n- consulta \"mês\" → SEMPRE mostrar dia/mês\n- consulta \"todas/agenda\" → SEMPRE mostrar dia/mês\n\nNunca decidir automaticamente.\nNunca omitir datas quando for semana/mês/todas.\nNunca variar o formato.\n\nFormato obrigatório quando mostrar:\nDD/MM\n\nExemplos:\n• Médico às 10h em 09/02\n• Aula de surf às 16h em 11/02\n\n---\n\n### TÍTULOS\n\n- hoje → \"Para hoje:\"\n- amanhã → \"Para amanhã:\"\n- semana → \"Próximos dias:\"\n- mês → \"Este mês:\"\n- todas → \"Suas tarefas pendentes:\"\n\n### SEM TAREFAS\n\nSe não houver resultados:\n\n\"Nada pendente.\" ou qualquer mensagem relacionada.\n\n### NUNCA RESPONDA PELA MEMÓRIA, RESPONDA PELOS DADOS QUE VEM DE {{ $json.tasks_text }} SE NÃO TIVER TAREFAS NUNCA INVENTE OU CRIE."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -1023,8 +1023,8 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        880,
-        -816
+        864,
+        -672
       ],
       "id": "419b2187-a0e1-49e1-b1d5-30de79c1e2da",
       "name": "Loop"
@@ -1043,8 +1043,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        1328,
-        -576
+        1312,
+        -432
       ],
       "id": "d0f5fff3-b7b4-4fd9-8a03-f7f44d5758bd",
       "name": "Reminder",
@@ -1120,8 +1120,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        608,
-        -800
+        592,
+        -656
       ],
       "id": "3982b40b-9bff-41ee-9fdf-50cc24769ca0",
       "name": "EstaPendente"
@@ -1163,7 +1163,7 @@
         "promptType": "define",
         "text": "={{ $('Dados').first().json.message }}",
         "options": {
-          "systemMessage": "=### PAPEL\n\nVocê é o DimiSocial.\n\nModo social do Dimi.\n\nSua única função é responder mensagens sociais de forma humana, leve e simpática.\n\nVocê NÃO executa ações.\nVocê NÃO chama tools.\nVocê NÃO cria, edita ou consulta tarefas.\nVocê NÃO explica o sistema.\nVocê NÃO ensina comandos.\n\nApenas converse naturalmente.\n\n---\n\n### CONTEXTO\n\nVocê só recebe mensagens já classificadas como SOCIAL.\n\nPortanto, sempre responda normalmente.\n\nNunca tente detectar intenção operacional.\n\n---\n\n### ESTILO OBRIGATÓRIO\n\nRespostas devem ser:\n- humanas\n- leves\n- simpáticas\n- naturais\n- no máximo 1 frase curta\n- linguagem simples\n- levemente informal\n- nunca robóticas ou técnicas\n\nUse o nome do usuário quando fizer sentido:\n{{ $('Dados').first().json.nome }}\n\nSoar como um amigo falando no WhatsApp.\n\n---\n\n### COMPORTAMENTO\n\nVocê pode:\n- cumprimentar\n- agradecer\n- reagir educadamente\n- puxar conversa leve\n- ocasionalmente fazer uma pergunta simples sobre o dia\n\nPerguntas devem ser:\n- sutis\n- naturais\n- sem explicar funcionalidades\n- sem instruções\n- sem parecer tutorial\n\n---\n\n### PROIBIDO\n\nNunca:\n- falar sobre tarefas, sistema ou funcionalidades\n- ensinar comandos\n- dar instruções\n- redirecionar fluxo\n- parecer robô\n\n---\n\n### REGRAS FINAIS\n\n- Responda com apenas 1 frase\n- 3 a 15 palavras\n- varie naturalmente as respostas\n- soe humano\n\n### EXEMPLOS DE RESPOSTA (REFERÊNCIA DE TOM)\n\nUse estes exemplos apenas como inspiração de estilo.\nNunca copiar exatamente. Varie naturalmente.\n\n\"Bom dia, {{ $('Dados').first().json.nome }}. Quais são os planos pra hoje?\"\n\"Oi, {{ $('Dados').first().json.nome }}! Tudo certo por aí?\"\n\"Boa tarde, {{ $('Dados').first().json.nome }}. Como tá o dia?\"\n\"Boa noite, {{ $('Dados').first().json.nome }}. Dia rendeu bem?\"\n\"Valeu, {{ $('Dados').first().json.nome }}! Tamo junto.\"\n\"Imagina, {{ $('Dados').first().json.nome }}. Sempre por aqui.\"\n\"Tranquilo, {{ $('Dados').first().json.nome }}.\"\n\"Show, {{ $('Dados').first().json.nome }}!\"\n\"Obrigado você, {{ $('Dados').first().json.nome }}.\"\n\"E aí, {{ $('Dados').first().json.nome }}, como as coisas estão indo?\"\n"
+          "systemMessage": "=### PAPEL\n\nVocê é o DimiSocial.\n\nModo social do Dimi.\n\nSua única função é responder mensagens sociais de forma humana, leve e simpática.\n\nVocê NÃO executa ações.\nVocê NÃO chama tools.\nVocê NÃO cria, edita ou consulta tarefas.\nVocê NÃO explica o sistema.\nVocê NÃO ensina comandos.\n\nApenas converse naturalmente.\n\n---\n\n### CONTEXTO\n\nVocê só recebe mensagens já classificadas como SOCIAL.\n\nPortanto, sempre responda normalmente.\n\nNunca tente detectar intenção operacional.\n\n---\n\n### ESTILO OBRIGATÓRIO\n\nRespostas devem ser:\n- humanas\n- leves\n- simpáticas\n- naturais\n- no máximo 1 frase curta\n- linguagem simples\n- levemente informal\n- sem gírias\n- nunca robóticas ou técnicas\n\nUse o nome do usuário quando fizer sentido:\n{{ $('Dados').first().json.nome }}\n\nSoar como um amigo falando no WhatsApp.\n\n---\n\n### COMPORTAMENTO\n\nVocê pode:\n- cumprimentar\n- agradecer\n- reagir educadamente\n- puxar conversa leve\n- ocasionalmente fazer uma pergunta simples sobre o dia\n\nPerguntas devem ser:\n- sutis\n- naturais\n- sem explicar funcionalidades\n- sem instruções\n- sem parecer tutorial\n\n---\n\n### PROIBIDO\n\nNunca:\n- falar sobre tarefas, sistema ou funcionalidades\n- ensinar comandos\n- dar instruções\n- redirecionar fluxo\n- parecer robô\n- falar com gírias\n\n---\n\n### REGRAS FINAIS\n\n- Responda com apenas 1 frase\n- 3 a 15 palavras\n- varie naturalmente as respostas\n- soe humano\n\n### EXEMPLOS DE RESPOSTA (REFERÊNCIA DE TOM)\n\nUse estes exemplos apenas como inspiração de estilo.\nNunca copiar exatamente. Varie naturalmente.\n\n\"Bom dia, {{ $('Dados').first().json.nome }}. Quais são os planos pra hoje?\"\n\"Oi, {{ $('Dados').first().json.nome }}! Tudo certo por aí?\"\n\"Boa tarde, {{ $('Dados').first().json.nome }}. Como tá o dia?\"\n\"Boa noite, {{ $('Dados').first().json.nome }}. Dia rendeu bem?\"\n\"Valeu, {{ $('Dados').first().json.nome }}! Tamo junto.\"\n\"Imagina, {{ $('Dados').first().json.nome }}. Sempre por aqui.\"\n\"Tranquilo, {{ $('Dados').first().json.nome }}.\"\n\"Show, {{ $('Dados').first().json.nome }}!\"\n\"Obrigado você, {{ $('Dados').first().json.nome }}.\"\n\"E aí, {{ $('Dados').first().json.nome }}, como as coisas estão indo?\"\n"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -1527,7 +1527,8 @@
         352
       ],
       "id": "cb5792d5-d54b-4796-8878-5d78e4a34e1d",
-      "name": "Classificador de Intenções"
+      "name": "Classificador de Intenções",
+      "executeOnce": true
     },
     {
       "parameters": {
@@ -2236,6 +2237,10 @@
             {
               "fieldId": "status",
               "fieldValue": "={{ $json.output.status ?? undefined }}"
+            },
+            {
+              "fieldId": "notification_sent",
+              "fieldValue": "={{ false }}"
             }
           ]
         }
@@ -2331,6 +2336,330 @@
       ],
       "id": "91de9a91-ad72-47fc-af8f-91e656e4be35",
       "name": "Memory3",
+      "credentials": {
+        "redis": {
+          "id": "Fapm8d5ddu151NUq",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5a28387c-914c-4a81-94fb-eca5f00b4b47",
+              "leftValue": "={{ $json.date }}",
+              "rightValue": "={{ $now.format('yyyy-MM-dd') }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        608,
+        -1152
+      ],
+      "id": "d5373359-dd43-44b8-9fd0-4baf13328e2f",
+      "name": "EstaPendente1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        192,
+        -1152
+      ],
+      "id": "f952767a-fd46-4631-9f69-865a53c4b10b",
+      "name": "Daily Digest"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "task",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "status",
+              "condition": "eq",
+              "keyValue": "Pendente"
+            },
+            {
+              "keyName": "date",
+              "condition": "eq",
+              "keyValue": "={{ $today.format('yyyy-MM-dd') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        400,
+        -1152
+      ],
+      "id": "2481fee8-f562-4f23-b578-8890bf157894",
+      "name": "tarefas_pendentes1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bsIWC5NX2iAVT0g0",
+          "name": "Supabase Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.tasks_text }}",
+        "options": {
+          "systemMessage": "Você é Dimi um assistente de produtividade que vive no whatsapp. você é acionado todas as manhãs as 8h\n\nSua única missão é organizar a lista das tarefas pendentes do usuário.\n\nVocê é objetivo, curto e simpático.\n\nA organização será uma tarefa por linha, datas e horas de maneira humanizadas, para um melhor UX\n\nNão utilize emojis, e coloque uma mensagem micro incentivadora sem parecer forçado, você é um amigo lembrando e cobrando."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1344,
+        -1344
+      ],
+      "id": "19a8c170-ef48-45f3-a3db-b8359b761fd6",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  tasks: $input.all().map(i => i.json)\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        912,
+        -1344
+      ],
+      "id": "00fae0d3-53e9-4891-9779-ee3c22fff260",
+      "name": "Agrupar1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const tasks = $input.first().json.tasks || [];\n\nconst tasksText = tasks.map(t =>\n  `${t.task_name} | ${t.date} | ${t.time}`\n).join('\\n');\n\nreturn [{\n  tasks_text: tasksText\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1136,
+        -1344
+      ],
+      "id": "17f6ac2b-02e8-4ca9-9832-350066b16710",
+      "name": "organizar_tasks1"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "=Dimi",
+        "remoteJid": "={{ $('tarefas_pendentes1').first().json.user_id }}",
+        "messageText": "={{ $json.output }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        1696,
+        -1344
+      ],
+      "id": "f8013934-f567-4c92-aaf2-6385abc71768",
+      "name": "Resposta",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ZaUgpg5vMAVfzHnW",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1344,
+        -1184
+      ],
+      "id": "9618b63b-99b7-4a97-a242-9155b02079f0",
+      "name": "Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "L2QrGOThx3AR0hfD",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Mande uma mensagem objetiva e curta",
+        "options": {
+          "systemMessage": "Você é Dimi um assistente de produtividade que vive no whatsapp. você é acionado todas as manhãs as 8h\n\nSua única missão é perguntar ao usuário de diferentes formas, \"quais os planos para hoje?\" e todos os tipos de mensagens relacionadas.\n\nVocê é objetivo, curto e simpático.\n\nNão utilize emojis, você é um amigo lembrando e cobrando.\n\nMENSAGENS CURTAS E OBJETIVAS.\nMUDE A FORMA, NUNCA ENVIE A MESMA MENSAGEM TODOS OS DIAS MAS SEMPRE MANDE BOM DIA."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        896,
+        -1056
+      ],
+      "id": "5effce1e-72cc-4680-8e91-86053e702280",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        896,
+        -880
+      ],
+      "id": "d4c4052a-caa6-4bd5-a4ed-b216ed3090fb",
+      "name": "Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "L2QrGOThx3AR0hfD",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('tarefas_pendentes1').first().json.user_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.5,
+      "position": [
+        1472,
+        -1184
+      ],
+      "id": "9c511d53-e320-4a80-9b7c-4ced6dc67484",
+      "name": "Memory4",
+      "credentials": {
+        "redis": {
+          "id": "Fapm8d5ddu151NUq",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('tarefas_pendentes1').first().json.user_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.5,
+      "position": [
+        1024,
+        -880
+      ],
+      "id": "95f0a6c2-cc11-41db-a970-4e45594b399c",
+      "name": "Memory5",
+      "credentials": {
+        "redis": {
+          "id": "Fapm8d5ddu151NUq",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "=Dimi",
+        "remoteJid": "={{ $('tarefas_pendentes1').first().json.user_id }}",
+        "messageText": "={{ $json.output }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        -1056
+      ],
+      "id": "fd2f614f-a8fc-4005-800f-d640eb53aa25",
+      "name": "Resposta1",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ZaUgpg5vMAVfzHnW",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('tarefas_pendentes').first().json.user_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.5,
+      "position": [
+        1456,
+        -400
+      ],
+      "id": "6faf8114-4d6e-430e-8d37-63dcfd5dbbea",
+      "name": "Redis Chat Memory",
+      "credentials": {
+        "redis": {
+          "id": "Fapm8d5ddu151NUq",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Dados').first().json.user_id }}",
+        "sessionTTL": 120
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.5,
+      "position": [
+        2096,
+        608
+      ],
+      "id": "f45490e1-05fb-4881-8907-d237ce371455",
+      "name": "Redis Chat Memory1",
       "credentials": {
         "redis": {
           "id": "Fapm8d5ddu151NUq",
@@ -3115,14 +3444,164 @@
           }
         ]
       ]
+    },
+    "Daily Digest": {
+      "main": [
+        [
+          {
+            "node": "tarefas_pendentes1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "tarefas_pendentes1": {
+      "main": [
+        [
+          {
+            "node": "EstaPendente1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EstaPendente1": {
+      "main": [
+        [
+          {
+            "node": "Agrupar1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agrupar1": {
+      "main": [
+        [
+          {
+            "node": "organizar_tasks1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "organizar_tasks1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory4": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory5": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Resposta1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "DimiLembre",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis Chat Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "Classificador de Intenções",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "83940855-eeee-42f2-a8f8-bfd961a56f1f",
+  "versionId": "022be676-4041-46f9-a280-814d0007f54c",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "3ecacd7c0e2cc43ed1297c4f6c5a3a71082a877830167910132a526dbd30d990"
