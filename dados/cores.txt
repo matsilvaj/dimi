@@ -1,0 +1,9 @@
+cores
+
+#111827 (texto forte)
+#6B7280 (texto secundário)
+#F3F4F6 (fundo leve)
+#FFFFFF (cards)
+
+
+#2563EB
