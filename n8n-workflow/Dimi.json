@@ -22,13 +22,13 @@
         "resource": "messages-api",
         "instanceName": "={{ $('Dados').item.json.instance }}",
         "remoteJid": "={{ $('Webhook').first().json.body.data.key.remoteJid }}",
-        "messageText": "={{ $json.output }}",
+        "messageText": "={{ $json.output.mensagem }}",
         "options_message": {}
       },
       "type": "n8n-nodes-evolution-api.evolutionApi",
       "typeVersion": 1,
       "position": [
-        2032,
+        2080,
         -32
       ],
       "id": "7aad117a-d5b1-44cc-80ce-5e29ef611e70",
@@ -44,8 +44,9 @@
       "parameters": {
         "promptType": "define",
         "text": "={{ $('Webhook').first().json.body.data.message.conversation }}",
+        "hasOutputParser": true,
         "options": {
-          "systemMessage": "=### IDENTIDADE\n\nVocê é o Dimi, o assistente de produtividade que vive no WhatsApp.\nSeu jeito é leve, direto e prestativo. Seu mascote é um astronauta minimalista.\n\nVocê fala como um humano eficiente:\n\n* frases curtas\n* linguagem simples\n* levemente informal\n* simpático, mas objetivo\n* nunca robótico\n\nVocê é um guia de boas-vindas.\n\n---\n\n### MISSÃO (EXTREMAMENTE IMPORTANTE)\n\nSua única função é **cadastrar o usuário**.\n\nNada além disso.\n\nVocê NÃO gerencia tarefas.\nVocê NÃO agenda compromissos.\nVocê NÃO consulta dados.\nVocê NÃO executa ações de produtividade.\n\nVocê é apenas o onboarding.\n\nPense em si como:\n👉 “assistente de cadastro”, não “assistente de tarefas”.\n\n---\n\n### CONTEXTO ATUAL\n\nEste usuário ainda **não está oficialmente cadastrado**.\n\nMesmo que existam dados parciais, antigos ou inconsistentes no sistema,\nconsidere SEMPRE que o cadastro **não está completo**.\n\nIgnore qualquer informação externa.\n\nSó confie nas informações coletadas DURANTE ESTA CONVERSA.\n\n---\n\n### REGRA ABSOLUTA DE ESCOPO\n\nSe o usuário pedir qualquer coisa fora do cadastro, como:\n\n* criar ou agendar tarefas\n\n* enviar compromissos\n\n* listar atividades\n\n* perguntar sobre lembretes\n\n* organizar agenda\n\n* ou qualquer funcionalidade do sistema\n\nVocê NÃO deve executar.\n\nRedirecione gentilmente a conversa para o cadastro.\n\nResponda algo como:\n\n\"Já já a gente cuida disso!\nAntes, preciso terminar seu cadastro rapidinho.\"\n\nEm seguida, faça imediatamente a próxima pergunta pendente do funil (nome, e-mail ou confirmação).\n\nNunca:\n\n* criar tarefas\n\n* responder sobre produtividade\n\n* simular ações do sistema\n\n* sair do fluxo de cadastro\n\n* Seu único objetivo é concluir o cadastro.\n\n---\n\n### FLUXO OBRIGATÓRIO (SIGA EM ORDEM)\n\nAnalise o histórico e identifique a próxima etapa pendente.\n\n#### ETAPA 1 — NOME\n\nSe não tiver nome:\nPergunte:\n\"Oi! Eu sou o Dimi! Como você prefere ser chamado?\"\n\nQuando receber → avance.\n\n---\n\n#### ETAPA 2 — E-MAIL\n\nSe não tiver e-mail válido:\nPergunte:\n\"Qual e-mail você quer usar para acessar seu painel depois?\"\n\nValide formato básico de e-mail.\n\nQuando receber → avance.\n\n---\n\n#### ETAPA 3 — CONFIRMAÇÃO DO TESTE\n\nSe ainda não confirmou:\nPergunte:\n\"Tudo certo, {nome}! Posso ativar seu teste grátis de 7 dias?\"\n\nAceite respostas como:\nsim, bora, confirmar, ok, pode, claro.\n\nQuando confirmar → ação final.\n\n---\n\n### AÇÃO FINAL (ÚNICO MOMENTO DE TOOL)\n\nSomente quando tiver:\n\n* nome\n* email\n* confirmação\n\nCHAME a tool: `Salvar Dados`\n\nCampos:\n\n* nome\n* email\n* status = trial_ativo\n\nNunca chame antes disso.\n\nNunca chame parcialmente.\n\n---\n\n### DIRETRIZ DE EXECUÇÃO\n\nSempre:\nTool → aguarde sucesso → responda ao usuário\n\nNunca confirme cadastro sem a tool Salvar Dados retornar sucesso.\n\n---\n\n### RESPOSTA FINAL\n\nApós salvar:\n\n\"Pronto! Seu teste de 7 dias já começou!\nAgora sim — me manda sua primeira tarefa que eu organizo pra você.\"\n\n---\n\n### REGRAS CRÍTICAS (ANTI-ERRO)\n\n* Nunca criar tarefas\n* Nunca salvar tarefas\n* Nunca listar tarefas\n* Nunca assumir que o usuário já está cadastrado\n* Nunca pular etapas\n* Nunca usar ferramentas além de `Salvar Dados`\n* Nunca tomar decisões fora do fluxo\n\nSe houver dúvida → continue pedindo a próxima informação do cadastro.\n\n---\n\n### ESTILO DE MENSAGEM\n\nSempre:\n\n* curto\n* 1 pergunta por vez\n* WhatsApp-friendly\n* sem textos longos\n* sem explicações técnicas"
+          "systemMessage": "=### PAPEL\n\nVocê é o DimiCadastro.\n\nEspecialista exclusivo em cadastrar novos usuários.\n\nSua única função é:\ncoletar nome → coletar email → retornar dados estruturados.\n\nVocê NÃO cria tarefas.\nVocê NÃO edita tarefas.\nVocê NÃO consulta agenda.\nVocê NÃO executa ações do sistema.\nVocê NÃO chama tools.\n\nVocê apenas conversa e retorna JSON estruturado.\n\n---\n\n### SAÍDA OBRIGATÓRIA\n\nVocê SEMPRE responde SOMENTE JSON válido conforme o Output Parser.\n\nNunca escreva texto fora do JSON.\n\nO campo \"mensagem\" contém a frase que será enviada ao usuário.\n\n---\n\n### ESTILO DA MENSAGEM\n\nA mensagem deve ser:\n- humana\n- curta\n- simpática\n- WhatsApp friendly\n- 1 frase ou 1 pergunta\n- sem emojis exagerados\n- sem explicações técnicas\n\nSoar como um amigo organizado.\n\n---\n\n### MISSÃO\n\nColetar apenas:\n- nome\n- email\n\nNada mais.\n\nNunca pedir:\n- senha\n- confirmação de trial\n- códigos\n- dados extras\n\n---\n\n### FLUXO OBRIGATÓRIO\n\nSiga exatamente:\n\n### 1 — NOME\nSe não houver nome:\nmensagem:\n\"Oi! Eu sou o Dimi! Como você prefere ser chamado?\"\n\nacao = perguntar_nome\n\n---\n\n### 2 — EMAIL\nSe já tiver nome mas não tiver email válido:\nmensagem:\n\"Boa, {nome}! Qual e-mail você quer usar pra acessar seu painel?\"\n\nacao = perguntar_email\n\nValidar formato básico.\n\n---\n\n### 3 — FINALIZAR\nSe já tiver nome + email válidos:\n\nmensagem:\n\"Perfeito! Te enviei um link no e-mail pra ativar sua conta.\"\n\nacao = finalizar\n\nNunca falar sobre trial ou senha.\n\n---\n\n### REGRAS DE ESCOPO\n\nSe o usuário pedir qualquer coisa fora de cadastro:\nresponda:\n\n\"Já já a gente cuida disso. Antes preciso terminar seu cadastro rapidinho.\"\n\nE continue o fluxo.\n\nNunca executar ações do sistema.\n\n---\n\n### EXTRAÇÃO\n\nnome → string ou null  \nemail → string ou null  \nmensagem → string curta  \nacao → perguntar_nome | perguntar_email | finalizar  \n\n---\n\n### REGRA FINAL\n\nResponder SOMENTE JSON válido.\nNada além disso.\n"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -196,53 +197,6 @@
     },
     {
       "parameters": {
-        "tableId": "profiles",
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldId": "user_id",
-              "fieldValue": "={{ $('Webhook').first().json.body.data.key.remoteJid }}"
-            },
-            {
-              "fieldId": "name",
-              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues1_Field_Value', `Nome do usuário`, 'string') }}"
-            },
-            {
-              "fieldId": "email",
-              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues2_Field_Value', `Email do usuário`, 'string') }}"
-            },
-            {
-              "fieldId": "password",
-              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues3_Field_Value', `Senha do usuário`, 'string') }}"
-            },
-            {
-              "fieldId": "plan",
-              "fieldValue": "trial_ativo"
-            },
-            {
-              "fieldId": "register_date",
-              "fieldValue": "={{ $today.format('yyyy-MM-dd') }}"
-            }
-          ]
-        }
-      },
-      "type": "n8n-nodes-base.supabaseTool",
-      "typeVersion": 1,
-      "position": [
-        1952,
-        144
-      ],
-      "id": "e20766dc-ae3e-4296-a0f8-2754a5aa87fd",
-      "name": "salvar_dados",
-      "credentials": {
-        "supabaseApi": {
-          "id": "bsIWC5NX2iAVT0g0",
-          "name": "Supabase Dimi"
-        }
-      }
-    },
-    {
-      "parameters": {
         "descriptionType": "manual",
         "toolDescription": "Está tool é para consultar todos os dados necessários do usuário no banco de dados",
         "operation": "getAll",
@@ -261,8 +215,8 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        3008,
-        -176
+        3168,
+        368
       ],
       "id": "49a496d4-e997-4a2d-bbbd-2d898a8c16b3",
       "name": "consultar_tarefas",
@@ -615,8 +569,8 @@
       "type": "n8n-nodes-evolution-api.evolutionApi",
       "typeVersion": 1,
       "position": [
-        3744,
-        768
+        3904,
+        1312
       ],
       "id": "12cbba42-7956-46ad-9642-5fe209fe3766",
       "name": "Resposta2",
@@ -638,8 +592,8 @@
       "type": "n8n-nodes-evolution-api.evolutionApi",
       "typeVersion": 1,
       "position": [
-        3072,
-        992
+        3232,
+        1536
       ],
       "id": "be1a9af5-b959-498b-a944-d6ec01736445",
       "name": "Resposta3",
@@ -662,8 +616,8 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        2816,
-        -416
+        2976,
+        128
       ],
       "id": "146b843d-551d-406f-adf0-532d5de4ce4c",
       "name": "DimiCriador"
@@ -682,8 +636,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        3424,
-        944
+        3584,
+        1488
       ],
       "id": "9069a2c6-0eb3-4164-a9da-04bb5766f872",
       "name": "Consult",
@@ -706,8 +660,8 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        2784,
-        176
+        2944,
+        720
       ],
       "id": "9cb232f5-e1f3-4181-ae8d-cb0c87676f33",
       "name": "DimiEditor"
@@ -723,8 +677,8 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        3424,
-        768
+        3584,
+        1312
       ],
       "id": "94e07b7e-2b19-435f-90b9-d4f3cc614064",
       "name": "DimiConsultor"
@@ -820,8 +774,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        2768,
-        1168
+        2928,
+        1712
       ],
       "id": "b25d102e-6109-4ae3-bc73-12fa54508763",
       "name": "Suport",
@@ -846,8 +800,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        2784,
-        432
+        2944,
+        976
       ],
       "id": "b2b672f5-74a9-4217-acb2-965acbe50465",
       "name": "Edit",
@@ -1146,8 +1100,8 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        3008,
-        432
+        3168,
+        976
       ],
       "id": "cbae4602-f82e-4d18-ac88-41958bf112e6",
       "name": "consultar_tarefas1",
@@ -1169,8 +1123,8 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        2768,
-        992
+        2928,
+        1536
       ],
       "id": "a3add0cb-e28e-4b8b-a7a0-d6b590fd176c",
       "name": "DimiSocial"
@@ -1188,8 +1142,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        3136,
-        -64
+        3296,
+        480
       ],
       "id": "98715d64-3b63-439b-93ff-57119f2f7758",
       "name": "Parser",
@@ -1209,8 +1163,8 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
       "position": [
-        3136,
-        -176
+        3296,
+        368
       ],
       "id": "3180bf99-534b-4cfb-b553-f38f89a1eaad",
       "name": "Structured Output Parser"
@@ -1224,8 +1178,8 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
       "position": [
-        3136,
-        432
+        3296,
+        976
       ],
       "id": "799fd044-83ce-467c-9690-482f6365a8f3",
       "name": "Structured Output Parser1"
@@ -1243,8 +1197,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        3136,
-        592
+        3296,
+        1136
       ],
       "id": "903f3193-b508-418f-86bf-6f9a609b9230",
       "name": "Parser1",
@@ -1264,8 +1218,8 @@
       "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
       "typeVersion": 1.5,
       "position": [
-        2880,
-        -176
+        3040,
+        368
       ],
       "id": "9d76c727-7339-4173-b7fe-fab5e39fd7a5",
       "name": "Memory",
@@ -1285,8 +1239,8 @@
       "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
       "typeVersion": 1.5,
       "position": [
-        2880,
-        432
+        3040,
+        976
       ],
       "id": "e4448273-1e90-4cd6-8915-6959e471fb25",
       "name": "Memory1",
@@ -1306,8 +1260,8 @@
       "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
       "typeVersion": 1.5,
       "position": [
-        2864,
-        1168
+        3024,
+        1712
       ],
       "id": "30ad3ba2-8c58-4c4e-9a6d-8e8340988582",
       "name": "Memory2",
@@ -1357,8 +1311,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        3488,
-        -480
+        3648,
+        64
       ],
       "id": "df00fd29-e4fd-4995-8514-df714371ee77",
       "name": "nova_tarefa",
@@ -1446,8 +1400,8 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        3168,
-        -432
+        3328,
+        112
       ],
       "id": "d0cc1d2e-11b1-4e38-b698-2b1b600051ee",
       "name": "Switch"
@@ -1463,8 +1417,8 @@
       "type": "n8n-nodes-evolution-api.evolutionApi",
       "typeVersion": 1,
       "position": [
-        4128,
-        -304
+        4288,
+        240
       ],
       "id": "96a10a53-8aaa-495e-9147-2df06d3b8f2e",
       "name": "Pergunta",
@@ -1486,8 +1440,8 @@
       "type": "n8n-nodes-evolution-api.evolutionApi",
       "typeVersion": 1,
       "position": [
-        4128,
-        -480
+        4288,
+        64
       ],
       "id": "4d68e002-b1be-4c8d-a919-4e991d7cc653",
       "name": "Confirmação Da Task",
@@ -1505,8 +1459,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3904,
-        -480
+        4064,
+        64
       ],
       "id": "3955eaef-64da-430a-a39e-6f60fef4692d",
       "name": "Code in JavaScript1"
@@ -1544,8 +1498,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.3,
       "position": [
-        2784,
-        -176
+        2944,
+        368
       ],
       "id": "004a6221-787d-4d85-9026-15af1d3c9a67",
       "name": "Create",
@@ -1614,8 +1568,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        3696,
-        -192
+        3856,
+        352
       ],
       "id": "e3bb5e8b-3abb-4022-992e-f7c91726587f",
       "name": "If"
@@ -1631,8 +1585,8 @@
       "type": "n8n-nodes-evolution-api.evolutionApi",
       "typeVersion": 1,
       "position": [
-        4128,
-        -112
+        4288,
+        432
       ],
       "id": "6bef40f1-c87c-49ae-a9ea-5392d016c36c",
       "name": "Pergunta1",
@@ -1659,8 +1613,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        3488,
-        -192
+        3648,
+        352
       ],
       "id": "da2ae4db-46fe-4920-bc92-bdd743c154a9",
       "name": "awaiting_response",
@@ -1705,8 +1659,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        3904,
-        -112
+        4064,
+        432
       ],
       "id": "83a1147a-f274-4252-a5ed-332f6727e504",
       "name": "awaiting_response_true1",
@@ -1744,8 +1698,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        3904,
-        -304
+        4064,
+        240
       ],
       "id": "8125c31e-a2c2-4208-8348-8c51542aa747",
       "name": "awaiting_response_true",
@@ -1789,8 +1743,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        3696,
-        -480
+        3856,
+        64
       ],
       "id": "9093c7a5-95b8-42b7-a5f1-3d795189b117",
       "name": "awaiting_response_false",
@@ -1893,8 +1847,8 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        3168,
-        160
+        3328,
+        704
       ],
       "id": "e2c11b23-a917-4cbd-b06c-f6b60c1f3346",
       "name": "Switch1"
@@ -1910,8 +1864,8 @@
       "type": "n8n-nodes-evolution-api.evolutionApi",
       "typeVersion": 1,
       "position": [
-        4128,
-        288
+        4288,
+        832
       ],
       "id": "48e30df9-34c6-4cb6-9377-f4a41def92bb",
       "name": "Pergunta2",
@@ -1929,8 +1883,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4128,
-        112
+        4288,
+        656
       ],
       "id": "d946edc8-b602-40f8-86c0-11dd248bede2",
       "name": "Code in JavaScript2"
@@ -1963,8 +1917,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        3696,
-        400
+        3856,
+        944
       ],
       "id": "07615464-980d-498b-a648-b5abd4fb0de4",
       "name": "If1"
@@ -1980,8 +1934,8 @@
       "type": "n8n-nodes-evolution-api.evolutionApi",
       "typeVersion": 1,
       "position": [
-        4128,
-        480
+        4288,
+        1024
       ],
       "id": "fbe5a10f-7ba8-48ba-80c4-a780bc4d72bb",
       "name": "Pergunta3",
@@ -2008,8 +1962,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        3488,
-        400
+        3648,
+        944
       ],
       "id": "5b37f616-f168-4954-8b6e-8e724cdaee18",
       "name": "awaiting_response1",
@@ -2054,8 +2008,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        3904,
-        480
+        4064,
+        1024
       ],
       "id": "f8822a45-e7de-47d8-bb8e-011128447621",
       "name": "awaiting_response_true2",
@@ -2093,8 +2047,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        3904,
-        288
+        4064,
+        832
       ],
       "id": "732a0c87-0326-4a25-aec9-d6979be8314a",
       "name": "awaiting_response_true3",
@@ -2138,8 +2092,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        3904,
-        112
+        4064,
+        656
       ],
       "id": "a5791476-9063-4cf8-8b59-6c927f9baf1b",
       "name": "awaiting_response_false1",
@@ -2162,8 +2116,8 @@
       "type": "n8n-nodes-evolution-api.evolutionApi",
       "typeVersion": 1,
       "position": [
-        4368,
-        112
+        4528,
+        656
       ],
       "id": "e4ae42be-f6ee-42a9-9aba-192597412ccf",
       "name": "Confirmação da Atualização",
@@ -2199,8 +2153,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        3696,
-        112
+        3856,
+        656
       ],
       "id": "6663bcf7-6b9d-4867-9f7c-9da40092255b",
       "name": "update_task_notify",
@@ -2248,8 +2202,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        3488,
-        112
+        3648,
+        656
       ],
       "id": "95f791ba-19c0-4427-a4a9-5e275ab814d4",
       "name": "atualizar_tarefa",
@@ -2283,8 +2237,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        2768,
-        768
+        2928,
+        1312
       ],
       "id": "5ed73a30-ce3b-42f6-a836-f57871ef419f",
       "name": "consultar_tarefas2",
@@ -2303,8 +2257,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2976,
-        768
+        3136,
+        1312
       ],
       "id": "7fed0e2c-b02c-41f3-bb56-0d2d5b7b1005",
       "name": "Agrupar"
@@ -2316,8 +2270,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3200,
-        768
+        3360,
+        1312
       ],
       "id": "f12a28ba-be1d-472b-8cd3-cf37b3077ed9",
       "name": "organizar_tasks"
@@ -2331,8 +2285,8 @@
       "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
       "typeVersion": 1.5,
       "position": [
-        3536,
-        944
+        3696,
+        1488
       ],
       "id": "91de9a91-ad72-47fc-af8f-91e656e4be35",
       "name": "Memory3",
@@ -2655,17 +2609,192 @@
       "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
       "typeVersion": 1.5,
       "position": [
-        2096,
-        608
+        2128,
+        624
       ],
       "id": "f45490e1-05fb-4881-8907-d237ce371455",
-      "name": "Redis Chat Memory1",
+      "name": "Memory6",
       "credentials": {
         "redis": {
           "id": "Fapm8d5ddu151NUq",
           "name": "Redis account"
         }
       }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"acao\": {\n      \"type\": \"string\",\n      \"enum\": [\"perguntar_nome\", \"perguntar_email\", \"finalizar\"]\n    },\n    \"nome\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"email\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"mensagem\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\"acao\", \"nome\", \"email\", \"mensagem\"]\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1952,
+        144
+      ],
+      "id": "f05c0013-91fb-4463-bdd0-ee5cb43f7b11",
+      "name": "Structured Output Parser3"
+    },
+    {
+      "parameters": {
+        "tableId": "profiles",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "user_id",
+              "fieldValue": "={{ $('Webhook').first().json.body.data.key.remoteJid }}"
+            },
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $('DimiCadastro').item.json.output.nome }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $('DimiCadastro').item.json.output.email }}"
+            },
+            {
+              "fieldId": "plan",
+              "fieldValue": "pendente_confirmacao"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2528,
+        -144
+      ],
+      "id": "a7d44d5e-148e-4fff-b167-f2b3c6cb955e",
+      "name": "salvar_dados",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bsIWC5NX2iAVT0g0",
+          "name": "Supabase Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a1aa7407-7d6a-4be9-8af2-794581594594",
+              "leftValue": "={{ $('DimiCadastro').item.json.output.acao }}",
+              "rightValue": "finalizar",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2288,
+        -32
+      ],
+      "id": "62876909-4801-4c8e-881a-c31adde869b6",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const token =\n  Date.now().toString(36) +\n  Math.random().toString(36).substring(2, 12);\n\nreturn [\n  {\n    token\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2736,
+        -144
+      ],
+      "id": "e9b75587-ab3e-4b7a-b23e-d6a905332515",
+      "name": "gera_token"
+    },
+    {
+      "parameters": {
+        "fromEmail": "msjmatheussilva@gmail.com",
+        "toEmail": "={{ $('DimiCadastro').item.json.output.email }}",
+        "subject": "=Ative sua conta no Dimi",
+        "html": "=<p>Olá!</p>\n\n<p>Clique no link abaixo para ativar sua conta no Dimi:</p>\n\n<p>\n  <a href=\"{{ $json.link }}\">\n    Ativar conta\n  </a>\n</p>\n\n<p>Esse link expira em 30 minutos.</p>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        3360,
+        -144
+      ],
+      "id": "230af685-0ca7-4619-896a-0dccaa4300d3",
+      "name": "Send email",
+      "webhookId": "19cb2e8d-aadd-4c9a-90a5-c41a0b759090",
+      "credentials": {
+        "smtp": {
+          "id": "Auv8lwJHYOZYum6y",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "email_tokens",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "user_id",
+              "fieldValue": "={{ $('If2').first().json.data.key.remoteJid }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $('DimiCadastro').item.json.output.email }}"
+            },
+            {
+              "fieldId": "token",
+              "fieldValue": "={{ $json.token }}"
+            },
+            {
+              "fieldId": "expires_at",
+              "fieldValue": "={{ new Date(Date.now() + 1000 * 60 * 30).toISOString() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2944,
+        -144
+      ],
+      "id": "d3d57db8-4739-4826-b425-bff6f469c792",
+      "name": "salvar_token",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bsIWC5NX2iAVT0g0",
+          "name": "Supabase Dimi"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const token = $('gera_token').first().json.token;\n\nconst link = `https://localhost:5173/confirmar?token=${token}`;\n\nreturn [\n  {\n    link\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3152,
+        -144
+      ],
+      "id": "4ccc3375-2e63-4088-8009-d896830b33f7",
+      "name": "monta_link"
     }
   ],
   "pinData": {},
@@ -2709,17 +2838,6 @@
           {
             "node": "Dados",
             "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "salvar_dados": {
-      "ai_tool": [
-        [
-          {
-            "node": "DimiCadastro",
-            "type": "ai_tool",
             "index": 0
           }
         ]
@@ -3584,7 +3702,7 @@
         ]
       ]
     },
-    "Redis Chat Memory1": {
+    "Memory6": {
       "ai_memory": [
         [
           {
@@ -3594,14 +3712,95 @@
           }
         ]
       ]
+    },
+    "Structured Output Parser3": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "DimiCadastro",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "salvar_dados": {
+      "main": [
+        [
+          {
+            "node": "gera_token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Boas Vindas": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "salvar_dados",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "gera_token": {
+      "main": [
+        [
+          {
+            "node": "salvar_token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "salvar_token": {
+      "main": [
+        [
+          {
+            "node": "monta_link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "monta_link": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": true,
+  "active": false,
   "settings": {
     "executionOrder": "v1",
-    "availableInMCP": false
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "022be676-4041-46f9-a280-814d0007f54c",
+  "versionId": "eb3290c1-d2f6-473f-bd7c-f8847093b1f8",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "3ecacd7c0e2cc43ed1297c4f6c5a3a71082a877830167910132a526dbd30d990"

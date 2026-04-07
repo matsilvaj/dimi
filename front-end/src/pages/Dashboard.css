@@ -1,0 +1,45 @@
+.dashboard-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #ffffff;
+  padding: 20px;
+}
+
+.dashboard-card {
+  width: 100%;
+  max-width: 520px;
+  text-align: center;
+}
+
+.dashboard-card h1 {
+  font-size: 2.4rem;
+  letter-spacing: -1px;
+  color: #1a1a1a;
+  margin: 0 0 14px;
+}
+
+.dashboard-card p {
+  color: #6b7280;
+  margin: 0 0 28px;
+}
+
+.dashboard-logout {
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 20px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dashboard-logout:hover {
+  background-color: #1d4ed8;
+}
+
+.dashboard-logout:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

@@ -126,6 +126,30 @@
   background-color: #1d4ed8;
 }
 
+.btn-login-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.login-feedback {
+  margin: -4px 0 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.92rem;
+  text-align: center;
+  color: #6b7280;
+  background: #f9fafb;
+}
+
+.login-feedback.error {
+  color: #b91c1c;
+}
+
+.login-feedback.success {
+  color: #2563eb;
+}
+
 .login-footer {
   margin-top: 30px;
   font-size: 0.95rem;
