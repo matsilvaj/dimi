@@ -111,8 +111,12 @@ export default function ConfirmarConta() {
       password,
     });
 
-    if (signUpError && !signUpError.message.toLowerCase().includes("registered")) {
-      showPopup("error", "Erro", "Nao foi possivel criar o acesso.");
+    if (signUpError) {
+      if (signUpError.message.toLowerCase().includes("registered")) {
+        showPopup("warning", "Acesso existente", "Este e-mail ja possui acesso.");
+      } else {
+        showPopup("error", "Erro", "Nao foi possivel criar o acesso.");
+      }
       setLoading(false);
       return;
     }

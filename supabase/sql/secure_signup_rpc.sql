@@ -32,6 +32,7 @@ set search_path = public
 as $$
 declare
   v_user_id text;
+  v_profile_user_id text;
   v_profiles_updated integer;
 begin
   select et.user_id
@@ -49,11 +50,22 @@ begin
     return false;
   end if;
 
+  select p.user_id
+    into v_profile_user_id
+  from public.profiles p
+  where p.user_id = v_user_id
+     or p.email = p_email
+  order by case when p.user_id = v_user_id then 0 else 1 end
+  limit 1;
+
+  if v_profile_user_id is null then
+    return false;
+  end if;
+
   update public.profiles p
     set plan = 'ativo',
         register_date = coalesce(p.register_date, now())
-  where p.email = p_email
-     or p.user_id = v_user_id;
+  where p.user_id = v_profile_user_id;
 
   get diagnostics v_profiles_updated = row_count;
 
